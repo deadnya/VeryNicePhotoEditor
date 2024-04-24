@@ -19,5 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
+
 rootProject.name = "VeryNicePhotoEditor"
 include(":app")
