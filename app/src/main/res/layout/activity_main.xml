@@ -11,8 +11,8 @@
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="500px"
-        android:layout_height="500px"
+        android:layout_width="1000px"
+        android:layout_height="1000px"
         android:scaleX="1"
         android:scaleY="1"
         app:layout_constraintBottom_toBottomOf="parent"
