@@ -82,17 +82,20 @@ class MainActivity : AppCompatActivity() {
         }
         binding.button2.setOnClickListener {
             val bitmap = drawableToBitmap(binding.imageView.drawable)
-            val minimizedBitmap = scalingAlgorithms.scaleImage(bitmap, 0.5)
-            binding.imageView.setImageBitmap(minimizedBitmap)
-            updateImageViewAndText(minimizedBitmap)
+            lifecycleScope.launch {
+                val minimizedBitmap = scalingAlgorithms.scaleImageBicubic(bitmap, 0.5)
+                binding.imageView.setImageBitmap(minimizedBitmap)
+                updateImageViewAndText(minimizedBitmap)
+            }
         }
 
         binding.button3.setOnClickListener {
             val bitmap = drawableToBitmap(binding.imageView.drawable)
-            val scaledBitmap = scalingAlgorithms.scaleImage(bitmap, 2.0)
-            binding.imageView.setImageBitmap(scaledBitmap)
-            updateImageViewAndText(scaledBitmap)
-
+            lifecycleScope.launch {
+                val scaledBitmap = scalingAlgorithms.scaleImage(bitmap, 2.0)
+                binding.imageView.setImageBitmap(scaledBitmap)
+                updateImageViewAndText(scaledBitmap)
+            }
         }
         binding.button4.setOnClickListener {
             val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
