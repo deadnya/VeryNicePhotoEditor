@@ -12,6 +12,7 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.example.verynicephotoeditor.databinding.ActivityMainBinding
@@ -19,6 +20,7 @@ import kotlin.math.exp
 import kotlin.math.pow
 import kotlin.math.sqrt
 import kotlin.math.truncate
+import kotlin.random.Random
 
 
 class MainActivity : AppCompatActivity() {
@@ -49,7 +51,7 @@ class MainActivity : AppCompatActivity() {
             val bitmap = drawableToBitmap(binding.imageView.drawable)
             val grayscaledBitmap = applyGrayscaleFilter(bitmap)
 
-            val contrastedBitmap = applyEdgerator(bitmap, 150)
+            val contrastedBitmap = applyPaperize(bitmap)
             binding.imageView.setImageBitmap(contrastedBitmap)
         }
 
@@ -328,7 +330,7 @@ class MainActivity : AppCompatActivity() {
         val width = bitmap.width
         val height = bitmap.height
 
-        var paperBitmap = BitmapFactory.decodeResource(resources, R.drawable.paper)
+        var paperBitmap = applyGrayscaleFilter(BitmapFactory.decodeResource(resources, R.drawable.paper))
         paperBitmap = Bitmap.createScaledBitmap(paperBitmap, width, height, false)
 
         val srcPixels = IntArray(width * height)
@@ -355,26 +357,11 @@ class MainActivity : AppCompatActivity() {
                 Color.blue(paperPixel)
             )
 
-            var newRed = 0
-            var newGreen = 0
-            var newBlue = 0
-
-            if (gray > 128) {
-                newRed = (red * gray) / 256
-                newGreen = (green * gray) / 256
-                newBlue = (blue * gray) / 256
-            }
-            else {
-                newRed = 255 - (((255 - red) * (255 - gray)) / 256)
-                newGreen = 255 - (((255 - green) * (255 - gray)) / 256)
-                newBlue = 255 - (((255 - blue) * (255 - gray)) / 256)
-            }
-
             destPixels[i] = Color.argb(
                 Color.alpha(pixel),
-                newRed.toInt(),
-                newGreen.toInt(),
-                newBlue.toInt()
+                (red * gray) / 256,
+                (green * gray) / 256,
+                (blue * gray) / 256
             )
         }
 
@@ -436,7 +423,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun applyEdgerator(bitmap: Bitmap, minMagnitude: Int) : Bitmap {
 
-        val grayscaledBitmap = applyGrayscaleFilter(bitmap)
+        val grayscaledBitmap = applyGaussBlur(applyGrayscaleFilter(bitmap), 3)
 
         val width = grayscaledBitmap.width
         val height = grayscaledBitmap.height
@@ -496,9 +483,9 @@ class MainActivity : AppCompatActivity() {
 
                     destPixels[y * width + x] = Color.argb(
                         Color.alpha(pixel),
-                        0,
-                        0,
-                        0
+                        (Color.red(pixel) * (magnitude / minMagnitude / 5)).toInt(),
+                        (Color.red(pixel) * (magnitude / minMagnitude / 5)).toInt(),
+                        (Color.red(pixel) * (magnitude / minMagnitude / 5)).toInt()
                     )
                 }
             }
@@ -506,7 +493,7 @@ class MainActivity : AppCompatActivity() {
 
         destBitmap.setPixels(destPixels, 0, width, 0, 0, width, height)
 
-        return applyGaussBlur(destBitmap, 13)
+        return destBitmap
     }
 
     private fun gaussianFunction(x : Double, y : Double, sigma : Double = 1.0) : Double {
@@ -568,7 +555,7 @@ class MainActivity : AppCompatActivity() {
                     for (i in x - bordDistX..x + bordDistX) {
 
                         val currX = Math.max(Math.min(bitmap.width - 1, i), 0)
-                        val currY = Math.max(Math.min(bitmap.width - 1, j), 0)
+                        val currY = Math.max(Math.min(bitmap.height - 1, j), 0)
 
                         sums[0] += kernelMatrix[j - (y - bordDistY)][i - (x - bordDistX)] / sum * Color.red(pixel)
                         sums[1] += kernelMatrix[j - (y - bordDistY)][i - (x - bordDistX)] / sum * Color.red(pixel)
@@ -581,6 +568,151 @@ class MainActivity : AppCompatActivity() {
                     sums[0].toInt(),
                     sums[1].toInt(),
                     sums[2].toInt()
+                )
+            }
+        }
+
+        destBitmap.setPixels(destPixels, 0, width, 0, 0, width, height)
+
+        return destBitmap
+    }
+
+    private fun applyGlass(bitmap: Bitmap, diffusion: Double) : Bitmap {
+
+        val width = bitmap.width
+        val height = bitmap.height
+
+        val destBitmap = Bitmap.createBitmap(width, height, bitmap.config)
+
+        for (x in 0..<width) {
+            for (y in 0..<height) {
+
+                val currX = Math.max(Math.min(Math.round(x + (Random.nextDouble() - 0.5) * diffusion), (width - 1).toLong()), 0)
+                val currY = Math.max(Math.min(Math.round(y + (Random.nextDouble() - 0.5) * diffusion), (height - 1).toLong()), 0)
+
+                destBitmap.setPixel(
+                    x,
+                    y,
+                    bitmap.getPixel(currX.toInt(), currY.toInt())
+                )
+            }
+        }
+
+        return destBitmap
+    }
+
+    fun <T> mode(list: List<T>): T? {
+        val frequencyMap = mutableMapOf<T, Int>()
+
+        for (element in list) {
+            val frequency = frequencyMap.getOrDefault(element, 0) + 1
+            frequencyMap[element] = frequency
+        }
+
+        var mode: T? = null
+        var maxFrequency = 0
+
+        for ((element, frequency) in frequencyMap) {
+            if (frequency > maxFrequency) {
+                mode = element
+                maxFrequency = frequency
+            }
+        }
+
+        return mode
+    }
+
+    private fun applyOilPaint(bitmap: Bitmap, neighbourhood: Int) : Bitmap {
+
+        val width = bitmap.width
+        val height = bitmap.height
+
+        val destBitmap = Bitmap.createBitmap(width, height, bitmap.config)
+        val destPixels = IntArray(width * height)
+
+        for (x in 0..<width) {
+            for (y in 0..<height) {
+
+                val pixel = bitmap.getPixel(x, y)
+
+                val redList = MutableList((neighbourhood * 2 + 1) * (neighbourhood * 2 + 1)) { 0 }
+                val greenList = MutableList((neighbourhood * 2 + 1) * (neighbourhood * 2 + 1)) { 0 }
+                val blueList = MutableList((neighbourhood * 2 + 1) * (neighbourhood * 2 + 1)) { 0 }
+
+                for (xx in x-neighbourhood..x+neighbourhood) {
+                    for (yy in y-neighbourhood..y+neighbourhood) {
+
+                        val currX = Math.max(Math.min(bitmap.width - 1, xx), 0)
+                        val currY = Math.max(Math.min(bitmap.height - 1, yy), 0)
+
+                        val currPixel = bitmap.getPixel(currX, currY)
+
+                        redList[(yy - y + neighbourhood) * (neighbourhood * 2 + 1) + xx - x + neighbourhood] = Color.red(currPixel)
+                        greenList[(yy - y + neighbourhood) * (neighbourhood * 2 + 1) + xx - x + neighbourhood] = Color.green(currPixel)
+                        blueList[(yy - y + neighbourhood) * (neighbourhood * 2 + 1) + xx - x + neighbourhood] = Color.blue(currPixel)
+                    }
+                }
+
+                val (modeRed, _) = redList.groupingBy { it }.eachCount().maxByOrNull { it.value }!!
+                val (modeGreen, _) = greenList.groupingBy { it }.eachCount().maxByOrNull { it.value }!!
+                val (modeBlue, _) = blueList.groupingBy { it }.eachCount().maxByOrNull { it.value }!!
+
+                destPixels[y * width + x] = Color.argb(
+                    Color.alpha(pixel),
+                    modeRed,
+                    modeGreen,
+                    modeBlue
+                )
+            }
+        }
+
+        destBitmap.setPixels(destPixels, 0, width, 0, 0, width, height)
+
+        return destBitmap
+    }
+
+    private fun applyEmbossFilter(bitmap: Bitmap) : Bitmap {
+
+        val width = bitmap.width
+        val height = bitmap.height
+
+        val grayscaledBitmap = applyGrayscaleFilter(bitmap)
+
+        val embossMatrix = arrayOf(
+            arrayOf(1, 0, -1),
+            arrayOf(2, 0, -2),
+            arrayOf(1, 0, -1)
+        )
+
+        val destBitmap = Bitmap.createBitmap(width, height, bitmap.config)
+        val destPixels = IntArray(width * height)
+
+        for (x in 0..<width) {
+            for (y in 0..<height) {
+
+                val pixel = grayscaledBitmap.getPixel(x, y)
+
+                var sum = 0;
+
+                for (xx in x-1..x+1) {
+                    for (yy in y-1..y+1) {
+
+                        val currX = Math.max(Math.min(bitmap.width - 1, xx), 0)
+                        val currY = Math.max(Math.min(bitmap.height - 1, yy), 0)
+
+                        val currPixel = grayscaledBitmap.getPixel(currX, currY)
+
+                        sum += embossMatrix[yy - y + 1][xx - x + 1] * Color.red(currPixel)
+                    }
+                }
+
+                sum = Math.max(Math.min(255, sum), 0)
+
+                destPixels[y * width + x] = Color.argb(
+                    Color.alpha(pixel),
+                    sum,
+                    sum,
+                    sum
                 )
             }
         }
