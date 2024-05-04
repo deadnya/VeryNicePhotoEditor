@@ -57,7 +57,7 @@ class MainActivity : AppCompatActivity() {
 
         binding.applyFilter.setOnClickListener {
             val bitmap = drawableToBitmap(binding.imageView.drawable)
-            val grayscaledBitmap = applyGrayscaleFilter(bitmap)
+            val grayscaledBitmap = applyUnsharpMask(bitmap, 0.2, 7)
 
             decodeSteganographyText(applySteganographyText(bitmap, "HELLO this is a text!!!"))
             binding.imageView.setImageBitmap(grayscaledBitmap)
@@ -1151,5 +1151,37 @@ class MainActivity : AppCompatActivity() {
         }
 
         return "0"
+    }
+
+    private fun applyUnsharpMask(bitmap: Bitmap, strength: Double, radius: Int) : Bitmap {
+
+        val blurredBitmap = applyGaussBlur(bitmap, radius)
+        val resultImage = Bitmap.createBitmap(bitmap.width, bitmap.height, bitmap.config)
+
+        for (x in 0 until bitmap.width) {
+            for (y in 0 until bitmap.height) {
+
+                val pixel = bitmap.getPixel(x, y)
+                val red = Color.red(pixel)
+                val green = Color.green(pixel)
+                val blue = Color.blue(pixel)
+
+                val blurredPixel = blurredBitmap.getPixel(x, y)
+                val blurredRed = Color.red(blurredPixel)
+                val blurredGreen = Color.green(blurredPixel)
+                val blurredBlue = Color.blue(blurredPixel)
+
+                val newPixel = Color.argb(
+                    255,
+                    Math.max(Math.min((red + (red - blurredRed) * strength).toInt(), 255), 0),
+                    Math.max(Math.min((green + (green - blurredGreen) * strength).toInt(), 255), 0),
+                    Math.max(Math.min((blue + (blue - blurredBlue) * strength).toInt(), 255), 0)
+                )
+
+                resultImage.setPixel(x, y, newPixel)
+            }
+        }
+
+        return resultImage
     }
 }
