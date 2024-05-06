@@ -58,13 +58,15 @@ class MainActivity : AppCompatActivity() {
         val display = windowManager.defaultDisplay
         val size = Point()
         display.getSize(size)
-        val width = size.x
-        val height = size.y
 
         val layoutParams = binding.imageView.layoutParams
-        layoutParams.width = width
-        layoutParams.height = height
+        layoutParams.width = size.x
+        layoutParams.height = size.y
         binding.imageView.layoutParams = layoutParams
+
+        val scale = 1
+        val width = size.x / scale
+        val height = size.y / scale
 
         binding.imageView.setImageBitmap(Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888))
         val bitmap = drawableToBitmap(binding.imageView.drawable)
@@ -84,8 +86,8 @@ class MainActivity : AppCompatActivity() {
             when (event.action) {
 
                 MotionEvent.ACTION_DOWN -> {
-                    startX = event.x
-                    startY = event.y
+                    startX = event.x / scale
+                    startY = event.y / scale
 
                     dotsList.add(Dot(startX, startY))
 
@@ -164,9 +166,13 @@ class MainActivity : AppCompatActivity() {
                 val dot2 = dotsList[i + 2]
                 val dot3 = dotsList[i + 3]
 
-                for (time in 0..100) {
+                var prevDot = dotsList[i]
 
-                    val t = time.toFloat() / 100
+                val iterations = 100
+
+                for (time in 0..iterations) {
+
+                    val t = time.toFloat() / iterations
 
                     val sqrDot0 = getDotAt(dot0, dot1, t)
                     val sqrDot1 = getDotAt(dot1, dot2, t)
@@ -177,7 +183,8 @@ class MainActivity : AppCompatActivity() {
 
                     val dot = getDotAt(cubDot0, cubDot1, t)
 
-                    drawDot(mutableBitmap, 5, dot.getX().toInt(), dot.getY().toInt())
+                    drawLine(mutableBitmap, prevDot, dot, 2)
+                    prevDot = dot
                 }
             }
 
@@ -191,6 +198,48 @@ class MainActivity : AppCompatActivity() {
             d1.getX() + (d2.getX() - d1.getX()) * pos,
             d1.getY() + (d2.getY() - d1.getY()) * pos
         )
+    }
+
+    private fun drawLine(mutableBitmap: Bitmap, dot1: Dot, dot2: Dot, strokeSize: Int) {
+
+        val x1 = dot1.getX().toInt()
+        val y1 = dot1.getY().toInt()
+        val x2 = dot2.getX().toInt()
+        val y2 = dot2.getY().toInt()
+
+        val dx = Math.abs(x2 - x1)
+        val dy = Math.abs(y2 - y1)
+
+        val sx = if (x1 < x2) 1 else -1
+        val sy = if (y1 < y2) 1 else -1
+
+        var err = dx - dy
+        var e2: Int
+
+        var x = x1
+        var y = y1
+
+        while (true) {
+            for (i in -strokeSize..strokeSize) {
+                for (j in -strokeSize..strokeSize) {
+                    if (x + i in 0 until mutableBitmap.width && y + j in 0 until mutableBitmap.height) {
+                        mutableBitmap.setPixel(x + i, y + j, Color.BLACK)
+                    }
+                }
+            }
+
+            if (x == x2 && y == y2) break
+
+            e2 = 2 * err
+            if (e2 > -dy) {
+                err -= dy
+                x += sx
+            }
+            if (e2 < dx) {
+                err += dx
+                y += sy
+            }
+        }
     }
 }
 
