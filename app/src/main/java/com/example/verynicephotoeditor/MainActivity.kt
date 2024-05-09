@@ -28,6 +28,12 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
+    private val ADD = 0
+    private val MOVE = 1
+    private val DELETE = 2
+
+    private val mainDotSize = 20
+    private val anchorDotSize = 10
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,7 +70,8 @@ class MainActivity : AppCompatActivity() {
         layoutParams.height = size.y
         binding.imageView.layoutParams = layoutParams
 
-        val scale = 1
+        val spaceLookaround = 50
+        val scale = 2
         val width = size.x / scale
         val height = size.y / scale
 
@@ -72,15 +79,20 @@ class MainActivity : AppCompatActivity() {
         val bitmap = drawableToBitmap(binding.imageView.drawable)
         val mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
 
-        val dotsList = mutableListOf<Dot>()
+        val mainDotsList = mutableListOf<MainDot>()
 
-        var startX : Float
-        var startY : Float
+        var startX = 0.0f
+        var startY = 0.0f
 
-        var endX : Float
-        var endY : Float
+        var mainDotsFirstIndex = -1
+        var anchorPrevDotFirstIndex = -1
+        var anchorNextDotFirstIndex = -1
 
         var traversedDist = 0.0f
+
+        var isMoving = false
+        var movingMain = false
+        var movingAnchor = false
 
         binding.imageView.setOnTouchListener { _, event ->
             when (event.action) {
@@ -89,26 +101,152 @@ class MainActivity : AppCompatActivity() {
                     startX = event.x / scale
                     startY = event.y / scale
 
-                    dotsList.add(Dot(startX, startY))
+                    mainDotsFirstIndex = -1
+                    anchorPrevDotFirstIndex = -1
+                    anchorNextDotFirstIndex = -1
 
-                    drawDot(mutableBitmap, 20, startX.toInt(), startY.toInt())
-
-                    updateBitmap(dotsList, mutableBitmap)
+                    mainDotsFirstIndex = getIndexOfDot(mainDotsList, startX, startY, mainDotSize, false, false)
+                    anchorPrevDotFirstIndex = getIndexOfDot(mainDotsList, startX, startY, anchorDotSize, true, false)
+                    anchorNextDotFirstIndex = getIndexOfDot(mainDotsList, startX, startY, anchorDotSize, false, true)
                 }
 
                 MotionEvent.ACTION_MOVE -> {
 
+                    isMoving = true
+
+                    if (mainDotsFirstIndex != -1) {
+                        mainDotsList[mainDotsFirstIndex].changeX(event.x / scale)
+                        mainDotsList[mainDotsFirstIndex].changeY(event.y / scale)
+                    }
+
+                    else if (anchorPrevDotFirstIndex != -1) {
+                        mainDotsList[anchorPrevDotFirstIndex].getPrevDot()?.changeX(event.x / scale)
+                        mainDotsList[anchorPrevDotFirstIndex].getPrevDot()?.changeY(event.y / scale)
+                    }
+
+                    else if (anchorNextDotFirstIndex != -1) {
+                        mainDotsList[anchorNextDotFirstIndex].getNextDot()?.changeX(event.x / scale)
+                        mainDotsList[anchorNextDotFirstIndex].getNextDot()?.changeY(event.y / scale)
+                    }
+
+                    mutableBitmap.eraseColor(Color.TRANSPARENT);
+                    update(mainDotsList, mutableBitmap)
                 }
 
                 MotionEvent.ACTION_UP -> {
-                    endX = event.x
-                    endY = event.y
+
+                    if (
+                        !isMoving &&
+                        mainDotsFirstIndex == -1 &&
+                        anchorPrevDotFirstIndex == -1 &&
+                        anchorNextDotFirstIndex == -1) {
+
+                        val mainDot = MainDot(startX, startY, null, null)
+
+                        val prevDot = AnchorDot(
+                            Math.max(Math.min(startX - spaceLookaround, (mutableBitmap.width - spaceLookaround).toFloat()), spaceLookaround.toFloat()),
+                            Math.max(Math.min(startY, (mutableBitmap.height - spaceLookaround).toFloat()), spaceLookaround.toFloat()),
+                            mainDot
+                        )
+
+                        val nextDot = AnchorDot(
+                            Math.max(Math.min(startX + spaceLookaround, (mutableBitmap.width - spaceLookaround).toFloat()), spaceLookaround.toFloat()),
+                            Math.max(Math.min(startY, (mutableBitmap.height - spaceLookaround).toFloat()), spaceLookaround.toFloat()),
+                            mainDot
+                        )
+
+                        mainDot.setAnchorDots(prevDot, nextDot)
+
+                        mainDotsList.add(mainDot)
+                    }
+
+                    if (!isMoving && (
+                        mainDotsFirstIndex != -1 ||
+                        anchorPrevDotFirstIndex != -1 ||
+                        anchorNextDotFirstIndex != -1)) {
+
+                        if (mainDotsFirstIndex != -1) {
+                            mainDotsList.removeAt(mainDotsFirstIndex)
+                        }
+
+                        else if (anchorPrevDotFirstIndex != -1) {
+                            mainDotsList.removeAt(anchorPrevDotFirstIndex)
+                        }
+
+                        else if (anchorNextDotFirstIndex != -1) {
+                            mainDotsList.removeAt(anchorNextDotFirstIndex)
+                        }
+                    }
+
+                    mutableBitmap.eraseColor(Color.TRANSPARENT);
+                    update(mainDotsList, mutableBitmap)
+                    isMoving = false
                 }
             }
             true
         }
 
     }
+
+    private fun getIndexOfDot(
+        mainDotsList: MutableList<MainDot>,
+        startX: Float,
+        startY: Float,
+        mainDotSize: Int,
+        searchPrevAnchor: Boolean,
+        searchNextAnchor: Boolean
+    ): Int {
+
+        for (i in mainDotsList.indices) {
+
+            val dot = mainDotsList[i]
+
+            if (!searchPrevAnchor && !searchNextAnchor) {
+
+                if (dist(
+                        dot.getX().toDouble(),
+                        dot.getY().toDouble(),
+                        startX.toDouble(),
+                        startY.toDouble()
+                    ) < mainDotSize
+                ) {
+                    return i
+                }
+
+            }
+
+            else {
+
+                val prevDot = dot.getPrevDot()
+                val nextDot = dot.getNextDot()
+
+                if (prevDot != null) {
+                    if (dist(
+                            prevDot.getX().toDouble(),
+                            prevDot.getY().toDouble(),
+                            startX.toDouble(),
+                            startY.toDouble()
+                        ) < mainDotSize && searchPrevAnchor) {
+                        return i
+                    }
+                }
+
+                if (nextDot != null) {
+                    if (dist(
+                            nextDot.getX().toDouble(),
+                            nextDot.getY().toDouble(),
+                            startX.toDouble(),
+                            startY.toDouble()
+                        ) < mainDotSize && searchNextAnchor) {
+                        return i
+                    }
+                }
+            }
+        }
+
+        return -1
+    }
+
     private fun drawableToBitmap(drawable: Drawable): Bitmap {
 
         if (drawable is BitmapDrawable) {
@@ -135,7 +273,13 @@ class MainActivity : AppCompatActivity() {
                 val currX = Math.max(Math.min(xx, mutableBitmap.width - 1), 0)
                 val currY = Math.max(Math.min(yy, mutableBitmap.height - 1), 0)
 
-                if (dist(xx, yy, x, y) < dotSize) {
+                if (dist(
+                        xx.toDouble(),
+                        yy.toDouble(),
+                        x.toDouble(),
+                        y.toDouble()
+                ) < dotSize) {
+
                     mutableBitmap.setPixel(currX, currY, Color.argb(
                         255,
                         0,
@@ -149,24 +293,67 @@ class MainActivity : AppCompatActivity() {
         binding.imageView.setImageBitmap(mutableBitmap)
     }
 
-    private fun dist(x1: Int, y1: Int, x2: Int, y2: Int) : Double {
-        return sqrt(((x1 - x2).toDouble().pow(2.0) + (y1 - y2).toDouble().pow(2.0)))
+    private fun dist(x1: Double, y1: Double, x2: Double, y2: Double) : Double {
+        return sqrt(((x1 - x2).pow(2.0) + (y1 - y2).pow(2.0)))
     }
 
-    private fun updateBitmap(dotsList: MutableList<Dot>, mutableBitmap: Bitmap) {
+    private fun update(dotsList: MutableList<MainDot>, mutableBitmap: Bitmap) {
 
-        if (dotsList.size > 3 && dotsList.size % 3 == 1) {
+        for (dot in dotsList) {
+            val prevDot = dot.getPrevDot()
+            val nextDot = dot.getNextDot()
 
-            for (i in dotsList.indices step 3) {
+            if (prevDot != null) {
+                drawLine(mutableBitmap, prevDot, dot, 1)
+            }
+
+            if (nextDot != null) {
+                drawLine(mutableBitmap, nextDot, dot, 1)
+            }
+
+            drawDot(mutableBitmap, mainDotSize, dot.getX().toInt(), dot.getY().toInt())
+
+            if (prevDot != null) {
+                drawDot(mutableBitmap, anchorDotSize, prevDot.getX().toInt(), prevDot.getY().toInt())
+            }
+
+            if (nextDot != null) {
+                drawDot(mutableBitmap, anchorDotSize, nextDot.getX().toInt(), nextDot.getY().toInt())
+            }
+        }
+
+        drawSpline(dotsList, mutableBitmap)
+    }
+
+    private fun getDotAt(d1: Dot?, d2: Dot?, pos: Float) : Dot{
+        if (d1 != null) {
+            if (d2 != null) {
+                return Dot (
+                    d1.getX() + (d2.getX() - d1.getX()) * pos,
+                    d1.getY() + (d2.getY() - d1.getY()) * pos
+                )
+            }
+        }
+
+        return Dot(0.0f, 0.0f)
+    }
+
+    private fun drawSpline(dotsList: MutableList<MainDot>, mutableBitmap: Bitmap) {
+
+        if (dotsList.size > 1) {
+
+            for (i in dotsList.indices) {
 
                 if (i == dotsList.size - 1) break
 
                 val dot0 = dotsList[i]
-                val dot1 = dotsList[i + 1]
-                val dot2 = dotsList[i + 2]
-                val dot3 = dotsList[i + 3]
+                val dot1 = dot0.getNextDot()
 
-                var prevDot = dotsList[i]
+                val dot3 = dotsList[i + 1]
+                val dot2 = dot3.getPrevDot()
+
+
+                var prevDot : Dot = dotsList[i]
 
                 val iterations = 100
 
@@ -191,13 +378,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.imageView.setImageBitmap(mutableBitmap)
-    }
-
-    private fun getDotAt(d1: Dot, d2: Dot, pos: Float) : Dot{
-        return Dot (
-            d1.getX() + (d2.getX() - d1.getX()) * pos,
-            d1.getY() + (d2.getY() - d1.getY()) * pos
-        )
     }
 
     private fun drawLine(mutableBitmap: Bitmap, dot1: Dot, dot2: Dot, strokeSize: Int) {
@@ -243,13 +423,47 @@ class MainActivity : AppCompatActivity() {
     }
 }
 
-class Dot(private val x: Float, private val y: Float) {
+class MainDot(
+    x: Float,
+    y: Float,
+    private var prevDot: AnchorDot?,
+    private var nextDot: AnchorDot?
+) : Dot(x, y){
 
+    fun setAnchorDots(prevDot: AnchorDot, nextDot: AnchorDot) {
+        this.prevDot = prevDot
+        this.nextDot = nextDot
+    }
+
+    fun getPrevDot() : AnchorDot? { return prevDot }
+    fun getNextDot() : AnchorDot? { return nextDot }
+}
+
+class AnchorDot(
+    x: Float,
+    y: Float,
+    private var mainDot: MainDot?
+) : Dot(x, y){
+
+}
+
+open class Dot(
+    private var x: Float,
+    private var y: Float
+) {
     fun getX() : Float {
         return x
     }
 
+    fun changeX(newX: Float) {
+        x = newX
+    }
+
     fun getY() : Float {
         return y
+    }
+
+    fun changeY(newY: Float) {
+        y = newY
     }
 }
