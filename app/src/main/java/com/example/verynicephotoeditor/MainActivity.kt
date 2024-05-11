@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity() {
     private val mainDotSize = 20
     private val anchorDotSize = 10
 
-    private val FXAA_ON = true
+    private val FXAA_ON = false
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,7 +74,7 @@ class MainActivity : AppCompatActivity() {
         binding.imageView.layoutParams = layoutParams
 
         val spaceLookaround = 50
-        val scale = 8
+        val scale = 2
         val width = size.x / scale
         val height = size.y / scale
 
@@ -323,7 +323,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        drawSpline(dotsList, mutableBitmap)
+        drawRectangle(dotsList, mutableBitmap)
 
         binding.imageView.setImageBitmap(mutableBitmap)
     }
@@ -406,7 +406,86 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
+        }
+    }
 
+    private fun drawRectangle(dotsList: MutableList<MainDot>, mutableBitmap: Bitmap) {
+
+        val width = mutableBitmap.width
+        val height = mutableBitmap.height
+
+        if (dotsList.size > 1) {
+
+            for (i in dotsList.indices) {
+
+                var dot0 : Dot
+                var dot1 : Dot
+                var dot2 : Dot
+                var dot3 : Dot
+
+                if (i == dotsList.size - 1) {
+                    dot0 = dotsList[i]
+                    dot1 = dot0.getNextDot()!!
+
+                    dot3 = dotsList[0]
+                    dot2 = dot3.getPrevDot()!!
+                }
+
+                else {
+                    dot0 = dotsList[i]
+                    dot1 = dot0.getNextDot()!!
+
+                    dot3 = dotsList[i + 1]
+                    dot2 = dot3.getPrevDot()!!
+                }
+
+                var prevDot: Dot = dotsList[i]
+
+                val iterations = 100
+
+                for (time in 0..iterations) {
+
+                    val t = time.toFloat() / iterations
+
+                    val sqrDot0 = getDotAt(dot0, dot1, t)
+                    val sqrDot1 = getDotAt(dot1, dot2, t)
+                    val sqrDot2 = getDotAt(dot2, dot3, t)
+
+                    val cubDot0 = getDotAt(sqrDot0, sqrDot1, t)
+                    val cubDot1 = getDotAt(sqrDot1, sqrDot2, t)
+
+                    val dot = getDotAt(cubDot0, cubDot1, t)
+
+                    drawLine(mutableBitmap, prevDot, dot, 2)
+                    prevDot = dot
+                }
+
+                if (FXAA_ON) {
+
+                    prevDot = dotsList[i]
+
+                    val destPixels = IntArray(width * height)
+                    mutableBitmap.getPixels(destPixels, 0, width, 0, 0, width, height)
+
+                    for (time in 0..iterations) {
+
+                        val t = time.toFloat() / iterations
+
+                        val sqrDot0 = getDotAt(dot0, dot1, t)
+                        val sqrDot1 = getDotAt(dot1, dot2, t)
+                        val sqrDot2 = getDotAt(dot2, dot3, t)
+
+                        val cubDot0 = getDotAt(sqrDot0, sqrDot1, t)
+                        val cubDot1 = getDotAt(sqrDot1, sqrDot2, t)
+
+                        val dot = getDotAt(cubDot0, cubDot1, t)
+
+                        lineFXAA(mutableBitmap, destPixels, prevDot, dot, 2)
+                        mutableBitmap.setPixels(destPixels, 0, width, 0, 0, width, height)
+                        prevDot = dot
+                    }
+                }
+            }
         }
     }
 
