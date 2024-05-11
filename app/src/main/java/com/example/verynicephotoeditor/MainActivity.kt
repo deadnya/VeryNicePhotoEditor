@@ -19,6 +19,7 @@ import android.view.MotionEvent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.example.verynicephotoeditor.databinding.ActivityMainBinding
+import kotlinx.coroutines.runBlocking
 import java.util.Vector
 import kotlin.math.abs
 import kotlin.math.pow
@@ -556,13 +557,8 @@ class MainActivity : AppCompatActivity() {
         var y = y1
 
         while (true) {
-            for (i in -fxaaStroke..fxaaStroke) {
-                for (j in -fxaaStroke..fxaaStroke) {
-                    if (x + i in 0 until mutableBitmap.width && y + j in 0 until mutableBitmap.height) {
-                        FXAA(mutableBitmap, destPixels, x + i, y + j)
-                    }
-                }
-            }
+
+            fxaaCoroutine(mutableBitmap, destPixels, x, y, fxaaStroke)
 
             if (x == x2 && y == y2) break
 
@@ -576,6 +572,30 @@ class MainActivity : AppCompatActivity() {
                 y += sy
             }
         }
+    }
+
+    private fun fxaaCoroutine(
+        mutableBitmap: Bitmap,
+        destPixels: IntArray,
+        x: Int,
+        y: Int,
+        fxaaStroke: Int
+    ): UInt = runBlocking {
+        repeat( (fxaaStroke * 2 + 1) * (fxaaStroke * 2 + 1)) {
+
+            if (x + (it % (fxaaStroke * 2 + 1) - fxaaStroke) in 0 until mutableBitmap.width
+                && y + (it / (fxaaStroke * 2 + 1) - fxaaStroke) in 0 until mutableBitmap.height) {
+
+                FXAA(
+                    mutableBitmap,
+                    destPixels,
+                    x + (it % (fxaaStroke * 2 + 1) - fxaaStroke),
+                    y + (it / (fxaaStroke * 2 + 1) - fxaaStroke)
+                )
+
+            }
+        }
+        0u
     }
 
     private fun FXAA(mutableBitmap: Bitmap, destPixels: IntArray, x: Int, y: Int) {
