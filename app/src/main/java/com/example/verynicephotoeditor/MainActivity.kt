@@ -9,6 +9,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Matrix
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.Build
@@ -28,6 +29,9 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
 import java.lang.Math.pow
+import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
 
 
 class MainActivity : AppCompatActivity() {
@@ -61,18 +65,22 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        val bitmap = drawableToBitmap(binding.imageView.drawable)
+        val mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
+
+        val dotsList = mutableListOf<Dot>()
+
         binding.imageView.setOnTouchListener { _, event ->
             when (event.action) {
-                MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {
+                MotionEvent.ACTION_DOWN -> {
 
-                    val bitmap = drawableToBitmap(binding.imageView.drawable)
-                    val mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
+                    val x = ((event.x) * 225 / 1000)
+                    val y = ((event.y) * 225 / 1000)
 
-                    val x = ((event.x) * 225 / 1000).toInt()
-                    val y = ((event.y) * 225 / 1000).toInt()
+                    dotsList.add(Dot(x, y))
 
-                    if (x in 0 until mutableBitmap.width && y in 0 until mutableBitmap.height) {
-                        binding.imageView.setImageBitmap(applyEditing(bitmap, x, y, 10.0, 0.4))
+                    if (dotsList.size >= 6) {
+                        binding.imageView.setImageBitmap(affinTransmutation(mutableBitmap, dotsList))
                     }
                 }
             }
@@ -98,79 +106,69 @@ class MainActivity : AppCompatActivity() {
         return bitmap
     }
 
-    private fun applyEditing(bitmap: Bitmap, x: Int, y: Int, brushSize: Double, strength: Double) : Bitmap {
+    fun affinTransmutation(bitmap: Bitmap, dotsList: List<Dot>): Bitmap {
 
-        val mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
+        val src = floatArrayOf(
+            dotsList[0].getX(), dotsList[0].getY(),
+            dotsList[1].getX(), dotsList[1].getY(),
+            dotsList[2].getX(), dotsList[2].getY()
+        )
 
-        var redSum = 0
-        var greenSum = 0
-        var blueSum = 0
-        var pixelCount = 0
+        val dst = floatArrayOf(
+            dotsList[3].getX(), dotsList[3].getY(),
+            dotsList[4].getX(), dotsList[4].getY(),
+            dotsList[5].getX(), dotsList[5].getY()
+        )
 
-        for (xx in x - Math.round(brushSize).toInt() + 1 .. (x + Math.round(brushSize).toInt() + 1)) {
-            for (yy in y - Math.round(brushSize).toInt() + 1 .. (y + Math.round(brushSize).toInt() + 1)) {
+        val matrix = Matrix()
+        matrix.setPolyToPoly(src, 0, dst, 0, 3)
 
-                val currX = Math.max(Math.min(xx, bitmap.width - 1), 0)
-                val currY = Math.max(Math.min(yy, bitmap.height - 1), 0)
+        var newMinX = Int.MAX_VALUE
+        var newMaxX = Int.MIN_VALUE
+        var newMinY = Int.MAX_VALUE
+        var newMaxY = Int.MIN_VALUE
 
-                val dist = dist(x, y, xx, yy)
+        for (y in 0 until bitmap.height) {
+            for (x in 0 until bitmap.width) {
+                val src = floatArrayOf(x.toFloat(), y.toFloat())
+                val dst = FloatArray(2)
+                matrix.mapPoints(dst, src)
 
-                if (dist <= brushSize) {
+                val newX = dst[0].toInt()
+                val newY = dst[1].toInt()
 
-                    val pixel = bitmap.getPixel(currX, currY)
-
-                    redSum += Color.red(pixel)
-                    greenSum += Color.green(pixel)
-                    blueSum += Color.blue(pixel)
-                    pixelCount++
-                }
+                newMinX = minOf(newMinX, newX)
+                newMaxX = maxOf(newMaxX, newX)
+                newMinY = minOf(newMinY, newY)
+                newMaxY = maxOf(newMaxY, newY)
             }
         }
 
-        val newRed = redSum / pixelCount
-        val newGreen = greenSum / pixelCount
-        val newBlue = blueSum / pixelCount
+        val result = Bitmap.createBitmap(newMaxX - newMinX, newMaxY - newMinY, bitmap.config)
 
-        for (xx in x - Math.round(brushSize).toInt() + 1 .. (x + Math.round(brushSize).toInt() + 1)) {
-            for (yy in y - Math.round(brushSize).toInt() + 1 .. (y + Math.round(brushSize).toInt() + 1)) {
+        for (y in 0 until bitmap.height) {
+            for (x in 0 until bitmap.width) {
+                val src = floatArrayOf(x.toFloat(), y.toFloat())
+                val dst = FloatArray(2)
+                matrix.mapPoints(dst, src)
 
-                val currX = Math.max(Math.min(xx, bitmap.width - 1), 0)
-                val currY = Math.max(Math.min(yy, bitmap.height - 1), 0)
+                val newX = max(min(dst[0].toInt() - newMinX, result.width - 1), 0)
+                val newY = max(min(dst[1].toInt() - newMinY, result.height - 1), 0)
 
-                val dist = dist(x, y, xx, yy)
-
-                if (dist <= brushSize) {
-
-                    val pixel = bitmap.getPixel(currX, currY)
-
-                    val red = Color.red(pixel)
-                    val green = Color.green(pixel)
-                    val blue = Color.blue(pixel)
-
-                    val redDiff = Math.round((newRed - red) * (brushSize - dist) / brushSize * strength).toInt()
-                    val greenDiff = Math.round((newGreen - green) * (brushSize - dist) / brushSize * strength).toInt()
-                    val blueDiff = Math.round((newBlue - blue) * (brushSize - dist) / brushSize * strength).toInt()
-
-                    val newPixel = Color.argb(
-                        255,
-                        red + redDiff,
-                        green + greenDiff,
-                        blue + blueDiff
-                    )
-
-                    mutableBitmap.setPixel(
-                        currX,
-                        currY,
-                        newPixel
-                    )
-                }
+                val pixel = bitmap.getPixel(x, y)
+                result.setPixel(newX, newY, pixel)
             }
         }
 
-        return mutableBitmap
+        return result
     }
+}
 
-    private fun dist(x1: Int, y1: Int, x2: Int, y2: Int) : Double {
-        return sqrt(((x1 - x2).toDouble().pow(2.0) + (y1 - y2).toDouble().pow(2.0)))
-    }
+class Dot(
+    private val x: Float,
+    private val y: Float
+) {
+
+    fun getX() : Float { return x }
+    fun getY() : Float { return y}
 }
