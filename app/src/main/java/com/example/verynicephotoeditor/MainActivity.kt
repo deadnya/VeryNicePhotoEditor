@@ -24,6 +24,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.verynicephotoeditor.databinding.ActivityMainBinding
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
 
 class MainActivity : AppCompatActivity() {
 
@@ -43,13 +45,12 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-
     @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val requestPermissions =
-            registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { results ->
+            registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { _ ->
 
             }
 
@@ -75,7 +76,7 @@ class MainActivity : AppCompatActivity() {
         binding.button.setOnClickListener {
             val bitmap = drawableToBitmap(binding.imageView.drawable)
             lifecycleScope.launch {
-                val rotatedBitmap = rotationAlgorithm.rotateBitmap(bitmap, 45.0)
+                val rotatedBitmap = rotationAlgorithm.rotateBitmap(bitmap, 27.0)
                 binding.imageView.setImageBitmap(rotatedBitmap)
                 updateImageViewAndText(rotatedBitmap)
             }
@@ -83,7 +84,7 @@ class MainActivity : AppCompatActivity() {
         binding.button2.setOnClickListener {
             val bitmap = drawableToBitmap(binding.imageView.drawable)
             lifecycleScope.launch {
-                val minimizedBitmap = scalingAlgorithms.scaleImageBicubic(bitmap, 0.5)
+                val minimizedBitmap = scalingAlgorithms.scaleImageTrilinear(bitmap, 0.5)
                 binding.imageView.setImageBitmap(minimizedBitmap)
                 updateImageViewAndText(minimizedBitmap)
             }
@@ -102,7 +103,7 @@ class MainActivity : AppCompatActivity() {
             pickImage.launch(intent)
         }
         binding.button5.setOnClickListener {
-            //TODO: обработать проверку на наличие разрешения на сохранение фото
+            //TODO: обработать проверку на наличие разрешений
             saveImageToGallery()
         }
 
@@ -110,8 +111,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun saveImageToGallery() {
         val bitmap = (binding.imageView.drawable as BitmapDrawable).bitmap
+        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        val imageFileName = "JPEG_" + timeStamp + "_"
         val values = ContentValues().apply {
-            put(MediaStore.Images.Media.DISPLAY_NAME, "Image.jpg")
+            put(MediaStore.Images.Media.DISPLAY_NAME, imageFileName)
             put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 put(MediaStore.Images.Media.IS_PENDING, 1)

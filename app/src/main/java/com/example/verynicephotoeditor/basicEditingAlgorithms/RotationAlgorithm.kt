@@ -39,8 +39,10 @@ class RotationAlgorithm {
 
                 for (xCoordinate in 0 until newWidth) {
                     for (yCoordinate in startY until endY) {
-                        val x = (xCoordinate - newWidth / 2.0) * cos + (yCoordinate - newHeight / 2.0) * sin + px
-                        val y = -(xCoordinate - newWidth / 2.0) * sin + (yCoordinate - newHeight / 2.0) * cos + py
+                        val x =
+                            (xCoordinate - newWidth / 2.0) * cos + (yCoordinate - newHeight / 2.0) * sin + px
+                        val y =
+                            -(xCoordinate - newWidth / 2.0) * sin + (yCoordinate - newHeight / 2.0) * cos + py
 
                         if (x >= 0 && x < width && y >= 0 && y < height) {
                             val x1 = x.toInt()
@@ -94,7 +96,11 @@ class RotationAlgorithm {
                                 y - y1
                             )
 
-                            rotatedBitmap.setPixel(xCoordinate, yCoordinate, Color.rgb(red, green, blue))
+                            rotatedBitmap.setPixel(
+                                xCoordinate,
+                                yCoordinate,
+                                Color.rgb(red, green, blue)
+                            )
                         }
                     }
                 }
