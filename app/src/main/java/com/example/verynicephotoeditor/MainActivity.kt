@@ -9,6 +9,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Matrix
 import android.graphics.Point
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
@@ -18,6 +19,7 @@ import android.util.Log
 import android.view.MotionEvent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.example.verynicephotoeditor.databinding.ActivityMainBinding
 import kotlinx.coroutines.runBlocking
 import java.util.Vector
@@ -92,7 +94,9 @@ class MainActivity : AppCompatActivity() {
             Dot(-1.0, 1.0, 1.0)
         )
 
-        drawCube(mutableBitmap, cube, size)
+        val image = drawableToBitmap(ContextCompat.getDrawable(this, R.drawable.kitty))
+
+        drawCube(mutableBitmap, cube, size, image)
         binding.imageView.setImageBitmap(mutableBitmap)
 
         var startX = 0.0
@@ -119,8 +123,8 @@ class MainActivity : AppCompatActivity() {
                     cube.rotateX(distY)
                     cube.rotateY(-distX)
 
-                    mutableBitmap.eraseColor(Color.WHITE);
-                    drawCube(mutableBitmap, cube, size)
+                    mutableBitmap.eraseColor(Color.WHITE)
+                    drawCube(mutableBitmap, cube, size, image)
                     binding.imageView.setImageBitmap(mutableBitmap)
                 }
 
@@ -133,14 +137,14 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun drawableToBitmap(drawable: Drawable): Bitmap {
+    private fun drawableToBitmap(drawable: Drawable?): Bitmap {
 
         if (drawable is BitmapDrawable) {
             return drawable.bitmap
         }
 
         val bitmap = Bitmap.createBitmap(
-            drawable.intrinsicWidth,
+            drawable!!.intrinsicWidth,
             drawable.intrinsicHeight,
             Bitmap.Config.ARGB_8888
         )
@@ -151,7 +155,7 @@ class MainActivity : AppCompatActivity() {
         return bitmap
     }
 
-    private fun drawCube(mutableBitmap: Bitmap, cube: Cube, size: Point) {
+    private fun drawCube(mutableBitmap: Bitmap, cube: Cube, size: Point, image: Bitmap) {
 
         val translatedCube = Cube(
             Dot(cube.dot1.x, cube.dot1.y, cube.dot1.z + 1),
@@ -164,29 +168,193 @@ class MainActivity : AppCompatActivity() {
             Dot(cube.dot8.x, cube.dot8.y, cube.dot8.z + 1),
         )
 
-        drawDot(mutableBitmap, 10, translatedCube.dot1, size)
-        drawDot(mutableBitmap, 10, translatedCube.dot2, size)
-        drawDot(mutableBitmap, 10, translatedCube.dot3, size)
-        drawDot(mutableBitmap, 10, translatedCube.dot4, size)
-        drawDot(mutableBitmap, 10, translatedCube.dot5, size)
-        drawDot(mutableBitmap, 10, translatedCube.dot6, size)
-        drawDot(mutableBitmap, 10, translatedCube.dot7, size)
-        drawDot(mutableBitmap, 10, translatedCube.dot8, size)
+        val canvas = Canvas(mutableBitmap)
+
+        val image1 = affinTransmutation(image, cube.dot1, cube.dot2, cube.dot3)
+        val image2 = affinTransmutation(image, cube.dot1, cube.dot2, cube.dot6)
+        val image3 = affinTransmutation(image, cube.dot2, cube.dot3, cube.dot7)
+        val image4 = affinTransmutation(image, cube.dot3, cube.dot4, cube.dot8)
+        val image5 = affinTransmutation(image, cube.dot4, cube.dot1, cube.dot5)
+        val image6 = affinTransmutation(image, cube.dot5, cube.dot6, cube.dot7)
+
+        val z1 = (cube.dot1.z + cube.dot3.z) / 2
+        val z2 = (cube.dot1.z + cube.dot6.z) / 2
+        val z3 = (cube.dot2.z + cube.dot7.z) / 2
+        val z4 = (cube.dot3.z + cube.dot8.z) / 2
+        val z5 = (cube.dot8.z + cube.dot1.z) / 2
+        val z6 = (cube.dot5.z + cube.dot7.z) / 2
+
+        val z = mutableListOf(
+            z1,
+            z2,
+            z3,
+            z4,
+            z5,
+            z6,
+        )
+
+        z.sort()
+
+        val zDots = mutableListOf(
+            translatedCube.dot1.z,
+            translatedCube.dot2.z,
+            translatedCube.dot3.z,
+            translatedCube.dot4.z,
+            translatedCube.dot5.z,
+            translatedCube.dot6.z,
+            translatedCube.dot7.z,
+            translatedCube.dot8.z,
+        )
+
+        zDots.sort()
+
+        if (image1 != null && (z1 == z[0] || z1 == z[1] || z1 == z[2])) {
+            val minX = min(min(cube.dot1.x, cube.dot2.x), min(cube.dot3.x, cube.dot4.x))
+            val minY = min(min(cube.dot1.y, cube.dot2.y), min(cube.dot3.y, cube.dot4.y))
+            canvas.drawBitmap(image1, size.x / 2 + minX.toFloat() * 100, size.y / 2 + minY.toFloat() * 100, null)
+        }
+
+        if (image2 != null && (z2 == z[0] || z2 == z[1] || z2 == z[2])) {
+            val minX = min(min(cube.dot1.x, cube.dot2.x), min(cube.dot6.x, cube.dot5.x))
+            val minY = min(min(cube.dot1.y, cube.dot2.y), min(cube.dot6.y, cube.dot5.y))
+            canvas.drawBitmap(image2, size.x / 2 + minX.toFloat() * 100, size.y / 2 + minY.toFloat() * 100, null)
+        }
+
+        if (image3 != null && (z3 == z[0] || z3 == z[1] || z3 == z[2])) {
+            val minX = min(min(cube.dot2.x, cube.dot3.x), min(cube.dot7.x, cube.dot6.x))
+            val minY = min(min(cube.dot2.y, cube.dot3.y), min(cube.dot7.y, cube.dot6.y))
+            canvas.drawBitmap(image3, size.x / 2 + minX.toFloat() * 100, size.y / 2 + minY.toFloat() * 100, null)
+        }
+
+        if (image4 != null && (z4 == z[0] || z4 == z[1] || z4 == z[2])) {
+            val minX = min(min(cube.dot3.x, cube.dot4.x), min(cube.dot8.x, cube.dot7.x))
+            val minY = min(min(cube.dot3.y, cube.dot4.y), min(cube.dot8.y, cube.dot7.y))
+            canvas.drawBitmap(image4, size.x / 2 + minX.toFloat() * 100, size.y / 2 + minY.toFloat() * 100, null)
+        }
+
+        if (image5 != null && (z5 == z[0] || z5 == z[1] || z5 == z[2])) {
+            val minX = min(min(cube.dot4.x, cube.dot1.x), min(cube.dot5.x, cube.dot8.x))
+            val minY = min(min(cube.dot4.y, cube.dot1.y), min(cube.dot5.y, cube.dot8.y))
+            canvas.drawBitmap(image5, size.x / 2 + minX.toFloat() * 100, size.y / 2 + minY.toFloat() * 100, null)
+        }
+
+        if (image6 != null && (z6 == z[0] || z6 == z[1] || z6 == z[2])) {
+            val minX = min(min(cube.dot5.x, cube.dot6.x), min(cube.dot7.x, cube.dot8.x))
+            val minY = min(min(cube.dot5.y, cube.dot6.y), min(cube.dot7.y, cube.dot8.y))
+            canvas.drawBitmap(image6, size.x / 2 + minX.toFloat() * 100, size.y / 2 + minY.toFloat() * 100, null)
+        }
+
+        if (translatedCube.dot1.z != zDots[7]) drawDot(mutableBitmap, 10, translatedCube.dot1, size)
+        if (translatedCube.dot2.z != zDots[7]) drawDot(mutableBitmap, 10, translatedCube.dot2, size)
+        if (translatedCube.dot3.z != zDots[7]) drawDot(mutableBitmap, 10, translatedCube.dot3, size)
+        if (translatedCube.dot4.z != zDots[7]) drawDot(mutableBitmap, 10, translatedCube.dot4, size)
+        if (translatedCube.dot5.z != zDots[7]) drawDot(mutableBitmap, 10, translatedCube.dot5, size)
+        if (translatedCube.dot6.z != zDots[7]) drawDot(mutableBitmap, 10, translatedCube.dot6, size)
+        if (translatedCube.dot7.z != zDots[7]) drawDot(mutableBitmap, 10, translatedCube.dot7, size)
+        if (translatedCube.dot8.z != zDots[7]) drawDot(mutableBitmap, 10, translatedCube.dot8, size)
 
         val stroke = 2
 
-        drawLine(mutableBitmap, translatedCube.dot1, translatedCube.dot5, stroke, size)
-        drawLine(mutableBitmap, translatedCube.dot2, translatedCube.dot6, stroke, size)
-        drawLine(mutableBitmap, translatedCube.dot3, translatedCube.dot7, stroke, size)
-        drawLine(mutableBitmap, translatedCube.dot4, translatedCube.dot8, stroke, size)
-        drawLine(mutableBitmap, translatedCube.dot1, translatedCube.dot2, stroke, size)
-        drawLine(mutableBitmap, translatedCube.dot2, translatedCube.dot3, stroke, size)
-        drawLine(mutableBitmap, translatedCube.dot3, translatedCube.dot4, stroke, size)
-        drawLine(mutableBitmap, translatedCube.dot4, translatedCube.dot1, stroke, size)
-        drawLine(mutableBitmap, translatedCube.dot5, translatedCube.dot6, stroke, size)
-        drawLine(mutableBitmap, translatedCube.dot6, translatedCube.dot7, stroke, size)
-        drawLine(mutableBitmap, translatedCube.dot7, translatedCube.dot8, stroke, size)
-        drawLine(mutableBitmap, translatedCube.dot8, translatedCube.dot5, stroke, size)
+        Log.d("AAAA", zDots[0].toString())
+
+        if (translatedCube.dot1.z != zDots[7] && translatedCube.dot5.z != zDots[7])
+            drawLine(mutableBitmap, translatedCube.dot1, translatedCube.dot5, stroke, size)
+
+        if (translatedCube.dot2.z != zDots[7] && translatedCube.dot6.z != zDots[7])
+            drawLine(mutableBitmap, translatedCube.dot2, translatedCube.dot6, stroke, size)
+
+        if (translatedCube.dot3.z != zDots[7] && translatedCube.dot7.z != zDots[7])
+            drawLine(mutableBitmap, translatedCube.dot3, translatedCube.dot7, stroke, size)
+
+        if (translatedCube.dot4.z != zDots[7] && translatedCube.dot8.z != zDots[7])
+            drawLine(mutableBitmap, translatedCube.dot4, translatedCube.dot8, stroke, size)
+
+        if (translatedCube.dot1.z != zDots[7] && translatedCube.dot2.z != zDots[7])
+            drawLine(mutableBitmap, translatedCube.dot1, translatedCube.dot2, stroke, size)
+
+        if (translatedCube.dot2.z != zDots[7] && translatedCube.dot3.z != zDots[7])
+            drawLine(mutableBitmap, translatedCube.dot2, translatedCube.dot3, stroke, size)
+
+        if (translatedCube.dot3.z != zDots[7] && translatedCube.dot4.z != zDots[7])
+            drawLine(mutableBitmap, translatedCube.dot3, translatedCube.dot4, stroke, size)
+
+        if (translatedCube.dot4.z != zDots[7] && translatedCube.dot1.z != zDots[7])
+            drawLine(mutableBitmap, translatedCube.dot4, translatedCube.dot1, stroke, size)
+
+        if (translatedCube.dot5.z != zDots[7] && translatedCube.dot6.z != zDots[7])
+            drawLine(mutableBitmap, translatedCube.dot5, translatedCube.dot6, stroke, size)
+
+        if (translatedCube.dot6.z != zDots[7] && translatedCube.dot7.z != zDots[7])
+            drawLine(mutableBitmap, translatedCube.dot6, translatedCube.dot7, stroke, size)
+
+        if (translatedCube.dot7.z != zDots[7] && translatedCube.dot8.z != zDots[7])
+            drawLine(mutableBitmap, translatedCube.dot7, translatedCube.dot8, stroke, size)
+
+        if (translatedCube.dot8.z != zDots[7] && translatedCube.dot5.z != zDots[7])
+            drawLine(mutableBitmap, translatedCube.dot8, translatedCube.dot5, stroke, size)
+    }
+
+    fun connToDot(dot1: Dot, dot2: Dot, z: Double) {
+
+    }
+
+    fun affinTransmutation(bitmap: Bitmap, dot1: Dot, dot2: Dot, dot3: Dot): Bitmap? {
+
+        val src = floatArrayOf(
+            0.0f, 0.0f,
+            0.0f, bitmap.height.toFloat() - 1.0f,
+            bitmap.width.toFloat() - 1.0f, bitmap.height.toFloat() - 1.0f
+        )
+
+        val dst = floatArrayOf(
+            dot1.x.toFloat() * 100, dot1.y.toFloat() * 100,
+            dot2.x.toFloat() * 100, dot2.y.toFloat() * 100,
+            dot3.x.toFloat() * 100, dot3.y.toFloat() * 100
+        )
+
+        val matrix = Matrix()
+        matrix.setPolyToPoly(src, 0, dst, 0, 3)
+
+        var newMinX = Int.MAX_VALUE
+        var newMaxX = Int.MIN_VALUE
+        var newMinY = Int.MAX_VALUE
+        var newMaxY = Int.MIN_VALUE
+
+        for (y in 0 until bitmap.height) {
+            for (x in 0 until bitmap.width) {
+                val src = floatArrayOf(x.toFloat(), y.toFloat())
+                val dst = FloatArray(2)
+                matrix.mapPoints(dst, src)
+
+                val newX = dst[0].toInt()
+                val newY = dst[1].toInt()
+
+                newMinX = minOf(newMinX, newX)
+                newMaxX = maxOf(newMaxX, newX)
+                newMinY = minOf(newMinY, newY)
+                newMaxY = maxOf(newMaxY, newY)
+            }
+        }
+
+        if (newMaxX - newMinX <= 0 || newMaxY - newMinY <= 0) return null
+
+        val result = Bitmap.createBitmap(newMaxX - newMinX, newMaxY - newMinY, bitmap.config)
+
+        for (y in 0 until bitmap.height) {
+            for (x in 0 until bitmap.width) {
+                val src = floatArrayOf(x.toFloat(), y.toFloat())
+                val dst = FloatArray(2)
+                matrix.mapPoints(dst, src)
+
+                val newX = max(min(dst[0].toInt() - newMinX, result.width - 1), 0)
+                val newY = max(min(dst[1].toInt() - newMinY, result.height - 1), 0)
+
+                val pixel = bitmap.getPixel(x, y)
+                result.setPixel(newX, newY, pixel)
+            }
+        }
+
+        return result
     }
 
     private fun drawDot(mutableBitmap: Bitmap, dotSize: Int, dot: Dot, size: Point) {
@@ -262,10 +430,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun dist(x1: Double, y1: Double, x2: Double, y2: Double) : Double {
         return sqrt(((x1 - x2).pow(2.0) + (y1 - y2).pow(2.0)))
-    }
-
-    private fun dist3d(x1: Double, y1: Double, z1: Double, x2: Double, y2: Double, z2: Double) : Double {
-        return sqrt(((x1 - x2).pow(2.0) + (y1 - y2).pow(2.0) + (z1 - z2).pow(2.0)))
     }
 }
 
