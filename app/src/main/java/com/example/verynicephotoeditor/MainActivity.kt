@@ -7,9 +7,11 @@ import android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
 import android.os.Build
 import android.os.Bundle
 import android.view.Menu
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.commit
 import com.example.verynicephotoeditor.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -20,6 +22,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
 
         val requestPermissions = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { results ->
 
@@ -37,13 +40,12 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
 
+        supportFragmentManager.commit {
+            replace(R.id.framelayout, RotateFragment::class.java, null)
+        }
 
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.main, menu)
-        return true
-    }
+
 
 }
