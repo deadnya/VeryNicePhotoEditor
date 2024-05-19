@@ -42,7 +42,7 @@ class DrawFragment : Fragment() {
             val fragmentManager = parentFragmentManager
 
             fragmentManager.beginTransaction()
-                .replace(R.id.framelayout, rotateFragment)
+                .replace(R.id.frame, rotateFragment)
                 .addToBackStack(null)
                 .commit()
         }
@@ -55,7 +55,7 @@ class DrawFragment : Fragment() {
             val fragmentManager = parentFragmentManager
 
             fragmentManager.beginTransaction()
-                .replace(R.id.framelayout, sizeFragment)
+                .replace(R.id.frame, sizeFragment)
                 .addToBackStack(null)
                 .commit()
         }
@@ -69,7 +69,7 @@ class DrawFragment : Fragment() {
 
             // Заменяем RotateFragment на FilterFragment
             fragmentManager.beginTransaction()
-                .replace(R.id.framelayout, filterFragment)
+                .replace(R.id.frame, filterFragment)
                 .addToBackStack(null)
                 .commit()
         }
@@ -82,7 +82,7 @@ class DrawFragment : Fragment() {
             val fragmentManager = parentFragmentManager
 
             fragmentManager.beginTransaction()
-                .replace(R.id.framelayout, faceFragment)
+                .replace(R.id.frame, faceFragment)
                 .addToBackStack(null)
                 .commit()
         }

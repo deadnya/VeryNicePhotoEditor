@@ -1,14 +1,19 @@
 package com.example.verynicephotoeditor
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
-
+import androidx.lifecycle.ViewModelProvider
+import com.example.verynicephotoeditor.algorithms.task2.Filters
 
 class FilterFragment : Fragment() {
+
+    private lateinit var sharedViewModel: SharedViewModel
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -20,7 +25,7 @@ class FilterFragment : Fragment() {
             val fragmentManager = parentFragmentManager
 
             fragmentManager.beginTransaction()
-                .replace(R.id.framelayout, rotateFragment)
+                .replace(R.id.frame, rotateFragment)
                 .addToBackStack(null)
                 .commit()
         }
@@ -33,7 +38,7 @@ class FilterFragment : Fragment() {
             val fragmentManager = parentFragmentManager
 
             fragmentManager.beginTransaction()
-                .replace(R.id.framelayout, sizeFragment)
+                .replace(R.id.frame, sizeFragment)
                 .addToBackStack(null)
                 .commit()
         }
@@ -46,7 +51,7 @@ class FilterFragment : Fragment() {
             val fragmentManager = parentFragmentManager
 
             fragmentManager.beginTransaction()
-                .replace(R.id.framelayout, sizeFragment)
+                .replace(R.id.frame, sizeFragment)
                 .addToBackStack(null)
                 .commit()
         }
@@ -59,9 +64,23 @@ class FilterFragment : Fragment() {
             val fragmentManager = parentFragmentManager
 
             fragmentManager.beginTransaction()
-                .replace(R.id.framelayout, faceFragment)
+                .replace(R.id.frame, faceFragment)
                 .addToBackStack(null)
                 .commit()
+        }
+
+        val imageButton9 = view.findViewById<ImageButton>(R.id.imageButton9)
+        imageButton9.setOnClickListener {
+
+            sharedViewModel = ViewModelProvider(requireActivity()).get(SharedViewModel::class.java)
+
+            val bitmap = sharedViewModel.bitmap.value
+            if (bitmap != null) {
+                val filteredBitmap = Filters().applyGrayscaleFilter(bitmap)
+                sharedViewModel.setBitmap(filteredBitmap)
+            }
+
+            Log.d("AAAA", "AAAA")
         }
     }
 
@@ -71,6 +90,4 @@ class FilterFragment : Fragment() {
     ): View? {
         return inflater.inflate(R.layout.fragment_filter, container, false)
     }
-
-
 }

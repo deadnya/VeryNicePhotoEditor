@@ -27,7 +27,7 @@ class FaceFragment : Fragment() {
             val fragmentManager = parentFragmentManager
 
             fragmentManager.beginTransaction()
-                .replace(R.id.framelayout, sizeFragment)
+                .replace(R.id.frame, sizeFragment)
                 .addToBackStack(null)
                 .commit()
         }

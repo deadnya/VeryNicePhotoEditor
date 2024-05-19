@@ -43,7 +43,7 @@ class RotateFragment : Fragment() {
 
 
             fragmentManager.beginTransaction()
-                .replace(R.id.framelayout, filterFragment)
+                .replace(R.id.frame, filterFragment)
                 .addToBackStack(null)
                 .commit()
         }
@@ -56,7 +56,7 @@ class RotateFragment : Fragment() {
             val fragmentManager = parentFragmentManager
 
             fragmentManager.beginTransaction()
-                .replace(R.id.framelayout, sizeFragment)
+                .replace(R.id.frame, sizeFragment)
                 .addToBackStack(null)
                 .commit()
         }
@@ -70,7 +70,7 @@ class RotateFragment : Fragment() {
             val fragmentManager = parentFragmentManager
 
             fragmentManager.beginTransaction()
-                .replace(R.id.framelayout, sizeFragment)
+                .replace(R.id.frame, sizeFragment)
                 .addToBackStack(null)
                 .commit()
         }
@@ -83,7 +83,7 @@ class RotateFragment : Fragment() {
             val fragmentManager = parentFragmentManager
 
             fragmentManager.beginTransaction()
-                .replace(R.id.framelayout, faceFragment)
+                .replace(R.id.frame, faceFragment)
                 .addToBackStack(null)
                 .commit()
         }
