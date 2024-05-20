@@ -65,6 +65,37 @@ class MainMenuFragment : Fragment() {
         }
 
     @RequiresApi(Build.VERSION_CODES.P)
+    private val pickImageForRetush =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val imageUri = result.data?.data
+                val source = ImageDecoder.createSource(requireContext().contentResolver, imageUri!!)
+                var bitmap = ImageDecoder.decodeBitmap(source)
+
+                // Check if the bitmap is hardware accelerated
+                if (bitmap.config == Bitmap.Config.HARDWARE) {
+                    bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
+                }
+
+                val savedBitmap = bitmap.copy(bitmap.config, true)
+
+                startingBitmap = savedBitmap
+
+                val file = File(requireContext().cacheDir, "image")
+                val out = FileOutputStream(file)
+                startingBitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+                out.flush()
+                out.close()
+
+                val intent = Intent(requireContext(), RetushActivity::class.java)
+                intent.putExtra("imagePath", file.absolutePath)
+                startActivity(intent)
+
+                Log.d("AAA", "AAA")
+            }
+        }
+
+    @RequiresApi(Build.VERSION_CODES.P)
     @SuppressLint("MissingInflatedId")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -95,8 +126,8 @@ class MainMenuFragment : Fragment() {
         }
 
         binding.goToFilters.setOnClickListener {
-            val intent2 = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-            pickImage.launch(intent2)
+            val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+            pickImage.launch(intent)
         }
 
         binding.goToSplines.setOnClickListener {
@@ -111,6 +142,11 @@ class MainMenuFragment : Fragment() {
             transaction?.replace(R.id.mainFrame, CubeFragment())
             transaction?.disallowAddToBackStack()
             transaction?.commit()
+        }
+
+        binding.goToRetush.setOnClickListener {
+            val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+            pickImageForRetush.launch(intent)
         }
 
         return binding.root

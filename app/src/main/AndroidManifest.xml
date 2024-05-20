@@ -52,6 +52,11 @@
             android:name=".ImageStorageActivity"
             android:exported="true"
             android:theme="@style/Theme.VeryNicePhotoEditor.NoActionBar" />
+
+        <activity
+            android:name=".RetushActivity"
+            android:exported="true"
+            android:theme="@style/Theme.VeryNicePhotoEditor.NoActionBar" />
     </application>
 
 </manifest>

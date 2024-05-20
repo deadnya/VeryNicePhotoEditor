@@ -103,6 +103,12 @@ class CubeFragment : Fragment()  {
             true
         }
 
+        binding.backButton.setOnClickListener {
+            val transaction = activity?.supportFragmentManager?.beginTransaction()
+            transaction?.replace(R.id.mainFrame, MainMenuFragment())
+            transaction?.disallowAddToBackStack()
+            transaction?.commit()
+        }
     }
 
     override fun onCreateView(
