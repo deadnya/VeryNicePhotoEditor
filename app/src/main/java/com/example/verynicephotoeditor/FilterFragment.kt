@@ -63,6 +63,19 @@ class FilterFragment : Fragment() {
                 .addToBackStack(null)
                 .commit()
         }
+
+        val button5 = view.findViewById<ImageButton>(R.id.backPanel)
+
+        button5.setOnClickListener {
+            val panelFragment = PanelFragment()
+
+            val fragmentManager = parentFragmentManager
+
+            fragmentManager.beginTransaction()
+                .replace(R.id.framelayout, panelFragment)
+                .addToBackStack(null)
+                .commit()
+        }
     }
 
     override fun onCreateView(

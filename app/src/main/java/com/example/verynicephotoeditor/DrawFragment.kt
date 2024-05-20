@@ -67,7 +67,6 @@ class DrawFragment : Fragment() {
 
             val fragmentManager = parentFragmentManager
 
-            // Заменяем RotateFragment на FilterFragment
             fragmentManager.beginTransaction()
                 .replace(R.id.framelayout, filterFragment)
                 .addToBackStack(null)
