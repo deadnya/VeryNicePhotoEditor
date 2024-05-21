@@ -57,6 +57,11 @@
             android:name=".RetushActivity"
             android:exported="true"
             android:theme="@style/Theme.VeryNicePhotoEditor.NoActionBar" />
+
+        <activity
+            android:name=".AffineActivity"
+            android:exported="true"
+            android:theme="@style/Theme.VeryNicePhotoEditor.NoActionBar" />
     </application>
 
 </manifest>

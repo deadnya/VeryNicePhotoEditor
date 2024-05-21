@@ -56,7 +56,10 @@ class CubeFragment : Fragment()  {
             Dot(-1.0, 1.0, 1.0)
         )
 
-        val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.img)
+        cube.rotateX(100.0)
+        cube.rotateY(100.0)
+
+        val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.rsz_1lucky)
         drawable?.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
         val image = drawable?.let { Filters().drawableToBitmap(it) }
 

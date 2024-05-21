@@ -69,29 +69,76 @@ class MainMenuFragment : Fragment() {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 val imageUri = result.data?.data
-                val source = ImageDecoder.createSource(requireContext().contentResolver, imageUri!!)
-                var bitmap = ImageDecoder.decodeBitmap(source)
+                if (imageUri != null) {
+                    val source = ImageDecoder.createSource(requireContext().contentResolver, imageUri)
+                    var bitmap = ImageDecoder.decodeBitmap(source)
 
-                // Check if the bitmap is hardware accelerated
-                if (bitmap.config == Bitmap.Config.HARDWARE) {
-                    bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
+                    // Check if the bitmap is hardware accelerated
+                    if (bitmap.config == Bitmap.Config.HARDWARE) {
+                        bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
+                    }
+
+                    val savedBitmap = bitmap.copy(bitmap.config, true)
+
+                    startingBitmap = savedBitmap
+
+                    val file = File(requireContext().cacheDir, "image")
+                    val out = FileOutputStream(file)
+                    startingBitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+                    out.flush()
+                    out.close()
+
+                    val intent = Intent(requireContext(), RetushActivity::class.java)
+                    intent.putExtra("imagePath", file.absolutePath)
+                    startActivity(intent)
+
+                    Log.d("AAA", "AAA")
+                } else {
+                    // Handle the case where the imageUri is null
+                    Log.d("AAA", "Image URI is null")
                 }
+            } else {
+                // Handle the case where the result is not OK
+                Log.d("AAA", "Image picking operation was not successful")
+            }
+        }
 
-                val savedBitmap = bitmap.copy(bitmap.config, true)
+    @RequiresApi(Build.VERSION_CODES.P)
+    private val pickImageForAffines =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val imageUri = result.data?.data
+                if (imageUri != null) {
+                    val source = ImageDecoder.createSource(requireContext().contentResolver, imageUri)
+                    var bitmap = ImageDecoder.decodeBitmap(source)
 
-                startingBitmap = savedBitmap
+                    // Check if the bitmap is hardware accelerated
+                    if (bitmap.config == Bitmap.Config.HARDWARE) {
+                        bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
+                    }
 
-                val file = File(requireContext().cacheDir, "image")
-                val out = FileOutputStream(file)
-                startingBitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
-                out.flush()
-                out.close()
+                    val savedBitmap = bitmap.copy(bitmap.config, true)
 
-                val intent = Intent(requireContext(), RetushActivity::class.java)
-                intent.putExtra("imagePath", file.absolutePath)
-                startActivity(intent)
+                    startingBitmap = savedBitmap
 
-                Log.d("AAA", "AAA")
+                    val file = File(requireContext().cacheDir, "image")
+                    val out = FileOutputStream(file)
+                    startingBitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+                    out.flush()
+                    out.close()
+
+                    val intent = Intent(requireContext(), AffineActivity::class.java)
+                    intent.putExtra("imagePath", file.absolutePath)
+                    startActivity(intent)
+
+                    Log.d("AAA", "AAA")
+                } else {
+                    // Handle the case where the imageUri is null
+                    Log.d("AAA", "Image URI is null")
+                }
+            } else {
+                // Handle the case where the result is not OK
+                Log.d("AAA", "Image picking operation was not successful")
             }
         }
 
@@ -147,6 +194,11 @@ class MainMenuFragment : Fragment() {
         binding.goToRetush.setOnClickListener {
             val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
             pickImageForRetush.launch(intent)
+        }
+
+        binding.goToAffines.setOnClickListener {
+            val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+            pickImageForAffines.launch(intent)
         }
 
         return binding.root
