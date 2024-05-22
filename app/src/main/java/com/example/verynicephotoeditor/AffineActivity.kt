@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.os.Bundle
 import android.view.MotionEvent
 import androidx.appcompat.app.AppCompatActivity
@@ -22,7 +23,8 @@ class AffineActivity : AppCompatActivity()  {
         super.onCreate(savedInstanceState)
 
         val imagePath = intent.getStringExtra("imagePath")
-        val bitmap = BitmapFactory.decodeFile(imagePath)
+        var bitmap = BitmapFactory.decodeFile(imagePath)
+        var mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
 
         binding = ActivityAffinesBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -37,10 +39,7 @@ class AffineActivity : AppCompatActivity()  {
 
         binding.imageView.setOnTouchListener { _, event ->
             when (event.action) {
-                MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {
-
-                    val bitmap = Filters().drawableToBitmap(binding.imageView.drawable)
-                    val mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
+                MotionEvent.ACTION_DOWN -> {
 
                     val scaleFactorX = bitmap.width.toFloat() / binding.imageView.width
                     val scaleFactorY = bitmap.height.toFloat() / binding.imageView.height
@@ -50,8 +49,15 @@ class AffineActivity : AppCompatActivity()  {
 
                     dotsList.add(Dot(x, y))
 
+                    Affines().drawDot(mutableBitmap, 10, x.toInt(), y.toInt(), Color.RED)
+                    binding.imageView.setImageBitmap(mutableBitmap)
+
                     if (dotsList.size >= 6) {
-                        binding.imageView.setImageBitmap(Affines().affinTransmutation(mutableBitmap, dotsList))
+
+                        val newBitmap = Affines().affinTransmutation(bitmap, dotsList)
+                        bitmap = newBitmap
+                        mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
+                        binding.imageView.setImageBitmap(newBitmap)
                         dotsList = mutableListOf<Dot>()
                     }
                 }
