@@ -12,6 +12,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.commit
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.verynicephotoeditor.databinding.ActivityImageStorageBinding
 
 
@@ -55,5 +57,34 @@ class ImageStorageActivity : AppCompatActivity() {
         supportFragmentManager.commit {
             replace(R.id.frame, RotateFragment::class.java, null)
         }
+
+        val buttonList = listOf(
+            ButtonModel("Rotate"),
+            ButtonModel("Scale"),
+            ButtonModel("Grayscale"),
+            ButtonModel("Contrast"),
+            ButtonModel("Pixelate"),
+            ButtonModel("Sepia"),
+            ButtonModel("Solarize"),
+            ButtonModel("Dither"),
+            ButtonModel("Edge"),
+            ButtonModel("Blur"),
+            ButtonModel("Glass"),
+            ButtonModel("Oil"),
+            ButtonModel("Emboss"),
+            ButtonModel("Wave"),
+            ButtonModel("Mask"),
+            ButtonModel("Encode1"),
+            ButtonModel("Decode1"),
+            ButtonModel("Encode2"),
+            ButtonModel("Decode2"),
+            ButtonModel("Encode3"),
+            ButtonModel("Decode3"),
+            ButtonModel("")
+        )
+
+        val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
+        recyclerView.adapter = ButtonAdapter(buttonList, supportFragmentManager)
+        recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
     }
 }

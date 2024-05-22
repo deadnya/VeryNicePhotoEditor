@@ -10,7 +10,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.Fragment
 import com.example.verynicephotoeditor.algorithms.task2.Filters
 import com.example.verynicephotoeditor.algorithms.task9.Cube

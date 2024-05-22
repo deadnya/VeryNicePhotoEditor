@@ -5,6 +5,8 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import androidx.core.content.res.ResourcesCompat
+import com.example.verynicephotoeditor.R
 import kotlin.math.PI
 import kotlin.math.exp
 import kotlin.math.pow
@@ -54,11 +56,10 @@ class Filters {
             return drawable.bitmap
         }
 
-        val bitmap = Bitmap.createBitmap(
-            drawable.intrinsicWidth,
-            drawable.intrinsicHeight,
-            Bitmap.Config.ARGB_8888
-        )
+        val width = if (drawable.intrinsicWidth > 0) drawable.intrinsicWidth else 1000
+        val height = if (drawable.intrinsicHeight > 0) drawable.intrinsicHeight else 667
+
+        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
         drawable.setBounds(0, 0, canvas.width, canvas.height)
         drawable.draw(canvas)
@@ -490,13 +491,13 @@ class Filters {
                         val currY = Math.max(Math.min(bitmap.height - 1, j), 0)
 
                         sums[0] += kernelMatrix[j - (y - bordDistY)][i - (x - bordDistX)] / sum * Color.red(
-                            pixel
+                            bitmap.getPixel(currX, currY)
                         )
-                        sums[1] += kernelMatrix[j - (y - bordDistY)][i - (x - bordDistX)] / sum * Color.red(
-                            pixel
+                        sums[1] += kernelMatrix[j - (y - bordDistY)][i - (x - bordDistX)] / sum * Color.green(
+                            bitmap.getPixel(currX, currY)
                         )
-                        sums[2] += kernelMatrix[j - (y - bordDistY)][i - (x - bordDistX)] / sum * Color.red(
-                            pixel
+                        sums[2] += kernelMatrix[j - (y - bordDistY)][i - (x - bordDistX)] / sum * Color.blue(
+                            bitmap.getPixel(currX, currY)
                         )
                     }
                 }
@@ -675,7 +676,7 @@ class Filters {
         return destBitmap
     }
 
-    fun applyWave(bitmap: Bitmap): Bitmap {
+    fun applyWave(bitmap: Bitmap, a: Int, b: Int): Bitmap {
 
         val width = bitmap.width
         val height = bitmap.height
@@ -687,7 +688,7 @@ class Filters {
 
                 val currX = Math.max(
                     Math.min(
-                        Math.round(x + 20 * sin(2 * PI * y / 128)),
+                        Math.round(x + a * sin(2 * PI * y / b)),
                         (width - 1).toLong()
                     ), 0
                 )
@@ -915,7 +916,12 @@ class Filters {
 
                 currTextIndex++
 
-                val currChar: String = if (currTextIndex >= text.length) {
+                if (currTextIndex > text.length) {
+                    resultImage.setPixel(x, y, bitmap.getPixel(x, y))
+                    continue
+                }
+
+                val currChar: String = if (currTextIndex == text.length) {
                     "00000000"
                 }
 
@@ -979,9 +985,6 @@ class Filters {
 
                 resultImage.setPixel(x, y, resultPixel)
 
-                if (currTextIndex >= text.length) {
-                    return resultImage
-                }
             }
         }
 
