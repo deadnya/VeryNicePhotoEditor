@@ -6,93 +6,49 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
-import android.widget.ImageView
-
-
-
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 
 class DrawFragment : Fragment() {
 
+    override fun onCreateView(
+
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.fragment_face, container, false)
+
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val cornersIndicator = view.findViewById<ImageView>(R.id.imageButton14)
-        val curveIndicator = view.findViewById<ImageView>(R.id.imageButton15)
+        val button5 = view.findViewById<ImageButton>(R.id.backPanel)
 
-        cornersIndicator.setOnClickListener {
-            cornersIndicator.setBackgroundResource(R.drawable.white_border)
-
-            curveIndicator.setBackgroundResource(0)
-        }
-
-        curveIndicator.setOnClickListener {
-            curveIndicator.setBackgroundResource(R.drawable.white_border)
-
-            cornersIndicator.setBackgroundResource(0)
-        }
-
-        super.onViewCreated(view, savedInstanceState)
-
-        val button1 = view.findViewById<ImageButton>(R.id.rotate_button)
-
-        button1.setOnClickListener {
-            val rotateFragment = RotateFragment()
+        button5.setOnClickListener {
+            val panelFragment = PanelFragment()
 
             val fragmentManager = parentFragmentManager
 
             fragmentManager.beginTransaction()
-                .replace(R.id.framelayout, rotateFragment)
+                .replace(R.id.framelayout, panelFragment)
                 .addToBackStack(null)
                 .commit()
         }
 
-        val button2 = view.findViewById<ImageButton>(R.id.size_button)
+        val buttonList = listOf(
+            ButtonModel("Rotate"),
+            ButtonModel("Filter"),
+            ButtonModel("Size"),
+            ButtonModel("Draw"),
+            ButtonModel("Face"),
+            ButtonModel("Cube"),
+            ButtonModel("Masking")
+        )
 
-        button2.setOnClickListener {
-            val sizeFragment = SizeFragment()
+        val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
+        recyclerView.adapter = ButtonAdapter(buttonList, parentFragmentManager)
+        recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
 
-            val fragmentManager = parentFragmentManager
-
-            fragmentManager.beginTransaction()
-                .replace(R.id.framelayout, sizeFragment)
-                .addToBackStack(null)
-                .commit()
-        }
-
-        val button3 = view.findViewById<ImageButton>(R.id.filter_button)
-
-        button3.setOnClickListener {
-            val filterFragment = FilterFragment()
-
-            val fragmentManager = parentFragmentManager
-
-            fragmentManager.beginTransaction()
-                .replace(R.id.framelayout, filterFragment)
-                .addToBackStack(null)
-                .commit()
-        }
-
-        val button4 = view.findViewById<ImageButton>(R.id.face_button)
-
-        button4.setOnClickListener {
-            val faceFragment = FaceFragment()
-
-            val fragmentManager = parentFragmentManager
-
-            fragmentManager.beginTransaction()
-                .replace(R.id.framelayout, faceFragment)
-                .addToBackStack(null)
-                .commit()
-        }
     }
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_draw, container, false)
-    }
-
-
 }
