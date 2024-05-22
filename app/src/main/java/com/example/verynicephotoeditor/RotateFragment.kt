@@ -35,20 +35,5 @@ class RotateFragment : Fragment() {
                 .addToBackStack(null)
                 .commit()
         }
-
-        val buttonList = listOf(
-            ButtonModel("Rotate"),
-            ButtonModel("Filter"),
-            ButtonModel("Size"),
-            ButtonModel("Draw"),
-            ButtonModel("Face"),
-            ButtonModel("Cube"),
-            ButtonModel("Masking")
-        )
-
-        val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
-        recyclerView.adapter = ButtonAdapter(buttonList, parentFragmentManager)
-        recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-
     }
 }

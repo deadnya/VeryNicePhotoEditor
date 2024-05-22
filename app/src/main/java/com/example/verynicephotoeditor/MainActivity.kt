@@ -12,6 +12,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.commit
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.verynicephotoeditor.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -44,8 +46,19 @@ class MainActivity : AppCompatActivity() {
             replace(R.id.framelayout, RotateFragment::class.java, null)
         }
 
+        val buttonList = listOf(
+            ButtonModel("Rotate"),
+            ButtonModel("Filter"),
+            ButtonModel("Size"),
+            ButtonModel("Draw"),
+            ButtonModel("Face"),
+            ButtonModel("Cube"),
+            ButtonModel("Masking"),
+            ButtonModel("")
+        )
+
+        val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
+        recyclerView.adapter = ButtonAdapter(buttonList, supportFragmentManager)
+        recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
     }
-
-
-
 }
