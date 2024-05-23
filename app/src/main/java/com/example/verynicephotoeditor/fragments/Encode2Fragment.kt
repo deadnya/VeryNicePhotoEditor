@@ -54,7 +54,7 @@ class Encode2Fragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val uploadButton = view.findViewById<Button>(R.id.uploadButton)
+        val uploadButton = view.findViewById<ImageButton>(R.id.uploadButton)
         uploadButton.setOnClickListener {
             val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
             pickImage.launch(intent)
