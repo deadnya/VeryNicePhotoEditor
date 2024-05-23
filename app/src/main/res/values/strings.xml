@@ -11,4 +11,6 @@
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">Slideshow</string>
     <string name="enter_rotation_degree">Enter rotation degree</string>
+    <string name="scaling_factor_0_1">Scaling factor: 0.1</string>
+    <string name="degree_0">Degree: 0</string>
 </resources>

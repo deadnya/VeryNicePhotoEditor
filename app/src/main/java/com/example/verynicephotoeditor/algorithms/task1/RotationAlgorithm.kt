@@ -1,4 +1,4 @@
-package com.example.verynicephotoeditor.algorithms.task3
+package com.example.verynicephotoeditor.algorithms.task1
 
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -8,28 +8,23 @@ import kotlinx.coroutines.launch
 import kotlin.math.*
 
 class RotationAlgorithm {
-    private var originalBitmap: Bitmap? = null
+
     private var totalRotationDegrees = 0.0
     private var newWidth = 0
     private var newHeight = 0
-    var isOtherAlgorithmUsed = true
 
-    suspend fun rotateBitmap(source: Bitmap, degrees: Double): Bitmap = coroutineScope {
+    suspend fun rotateBitmap(source: Bitmap, degrees: Double, isOtherAlgorithmUsed: Boolean): Bitmap = coroutineScope {
 
-        if (isOtherAlgorithmUsed) {
-            originalBitmap = source.copy(source.config, true)
-            totalRotationDegrees = 0.0
-            isOtherAlgorithmUsed = false
-        }
 
         totalRotationDegrees += degrees
+        totalRotationDegrees%=360
 
         val angleInRadians = Math.toRadians(totalRotationDegrees)
         val cos = cos(angleInRadians)
         val sin = sin(angleInRadians)
 
-        val width = originalBitmap!!.width
-        val height = originalBitmap!!.height
+        val width = source.width
+        val height = source.height
 
         if (newWidth == 0 && newHeight == 0 || newWidth != height && newHeight != width) {
             newWidth = (width * abs(cos) + height * abs(sin)).roundToInt()
@@ -70,22 +65,22 @@ class RotationAlgorithm {
                             val y2 = (y + 1).toInt()
 
                             val pixel1 =
-                                if (x1 in 0 until width && y1 in 0 until height) originalBitmap!!.getPixel(
+                                if (x1 in 0 until width && y1 in 0 until height) source.getPixel(
                                     x1,
                                     y1
                                 ) else Color.TRANSPARENT
                             val pixel2 =
-                                if (x2 in 0 until width && y1 in 0 until height) originalBitmap!!.getPixel(
+                                if (x2 in 0 until width && y1 in 0 until height) source.getPixel(
                                     x2,
                                     y1
                                 ) else Color.TRANSPARENT
                             val pixel3 =
-                                if (x1 in 0 until width && y2 in 0 until height) originalBitmap!!.getPixel(
+                                if (x1 in 0 until width && y2 in 0 until height) source.getPixel(
                                     x1,
                                     y2
                                 ) else Color.TRANSPARENT
                             val pixel4 =
-                                if (x2 in 0 until width && y2 in 0 until height) originalBitmap!!.getPixel(
+                                if (x2 in 0 until width && y2 in 0 until height) source.getPixel(
                                     x2,
                                     y2
                                 ) else Color.TRANSPARENT
@@ -138,10 +133,6 @@ class RotationAlgorithm {
         y: Double
     ): Int {
         return ((q11 * (1 - x) * (1 - y) + q21 * x * (1 - y) + q12 * (1 - x) * y + q22 * x * y) + 0.5).toInt()
-    }
-    fun recycle() {
-        originalBitmap?.recycle()
-        originalBitmap = null
     }
 
 }
