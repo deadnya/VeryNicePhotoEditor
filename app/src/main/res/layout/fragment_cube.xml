@@ -20,14 +20,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
-        android:background="#FFFFFF"
+        android:background="#292E32"
         app:layout_constraintBottom_toBottomOf="parent">
 
-        <Button
+        <ImageButton
             android:id="@+id/backButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Back"
+            android:src="@drawable/back_button"
+            android:background="?android:attr/selectableItemBackground"
             android:layout_alignParentRight="true" />
 
         <Switch
@@ -39,8 +40,12 @@
             android:layout_marginStart="0dp"
             android:layout_marginTop="10dp"
             android:layout_marginEnd="42dp"
+            android:thumbTint="#007AFF"
+            android:trackTint="#007AFF"
             android:layout_toStartOf="@+id/backButton"
             android:text="Enable filtrations for cube image"
+            android:gravity="center"
+            android:textColor="#FFFFFF"
             tools:ignore="UseSwitchCompatOrMaterialXml" />
 
     </RelativeLayout>

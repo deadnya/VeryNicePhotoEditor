@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="16dp"
-        android:background="#CCFFFFFF"
+        android:background="#292E32"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <Switch
@@ -32,6 +32,9 @@
             android:layout_weight="1"
             android:singleLine="true"
             android:text="Spline / Rectangle"
+            android:textColor="#FFFFFF"
+            android:thumbTint="#007AFF"
+            android:trackTint="#007AFF"
             tools:ignore="UseSwitchCompatOrMaterialXml" />
 
         <Switch
@@ -39,13 +42,20 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="FXAA"
+            android:textColor="#FFFFFF"
+            android:thumbTint="#007AFF"
+            android:trackTint="#007AFF"
             tools:ignore="UseSwitchCompatOrMaterialXml" />
 
-        <Button
+        <ImageButton
             android:id="@+id/backButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Back" />
+            android:src="@drawable/back_button"
+            android:background="?android:attr/selectableItemBackground"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </LinearLayout>
 

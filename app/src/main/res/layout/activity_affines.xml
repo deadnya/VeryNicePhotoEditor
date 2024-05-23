@@ -2,7 +2,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#32393E">
 
     <ImageView
         android:id="@+id/imageView"
@@ -22,21 +23,24 @@
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent">
 
-        <Button
+        <ImageButton
             android:id="@+id/saveButton"
             android:layout_width="50dp"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
             android:layout_weight="1"
-            android:text="Save" />
+            android:src="@drawable/save_button"
+            android:background="?android:attr/selectableItemBackground" />
 
-        <Button
+        <ImageButton
             android:id="@+id/backButton"
             android:layout_width="50dp"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
             android:layout_weight="1"
-            android:text="Back" />
+            android:background="?android:attr/selectableItemBackground"
+            android:src="@drawable/back_button"
+            />
 
     </LinearLayout>
 

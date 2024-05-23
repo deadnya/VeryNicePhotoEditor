@@ -2,7 +2,9 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#32393E">
+    >
 
     <ImageView
         android:id="@+id/imageView"
@@ -20,7 +22,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
-        android:background="#FFFFFF"
+        android:background="#292E32"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <TextView
@@ -28,6 +30,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
+            android:textColor="#FFFFFF"
             android:text="Radius: 3" />
 
         <SeekBar
@@ -37,6 +40,8 @@
             android:layout_below="@+id/radiusValue"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="16dp"
+            android:thumbTint="#007AFF"
+            android:progressTint="#007AFF"
             android:max="47"
             android:progress="0" />
 
@@ -45,6 +50,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/radiusSlider"
+            android:textColor="#FFFFFF"
             android:layout_centerHorizontal="true"
             android:text="Strength: 0.10" />
 
@@ -55,23 +61,27 @@
             android:layout_below="@+id/strengthValue"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="16dp"
+            android:thumbTint="#007AFF"
+            android:progressTint="#007AFF"
             android:max="90"
             android:progress="0" />
 
-        <Button
+        <ImageButton
             android:id="@+id/saveButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Save"
+            android:src="@drawable/save_button"
+            android:background="?android:attr/selectableItemBackground"
             android:layout_below="@+id/strengthSlider"
             android:layout_alignParentStart="true"
             android:layout_marginTop="16dp" />
 
-        <Button
+        <ImageButton
             android:id="@+id/backButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Back"
+            android:src="@drawable/back_button"
+            android:background="?android:attr/selectableItemBackground"
             android:layout_below="@+id/strengthSlider"
             android:layout_alignParentEnd="true"
             android:layout_marginTop="16dp" />

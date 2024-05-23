@@ -69,6 +69,7 @@ class SplinesFragment : Fragment() {
                     anchorPrevDotFirstIndex = -1
                     anchorNextDotFirstIndex = -1
 
+
                     mainDotsFirstIndex = Spline().getIndexOfDot(mainDotsList, startX, startY, Spline().mainDotSize, false, false)
                     anchorPrevDotFirstIndex = Spline().getIndexOfDot(mainDotsList, startX, startY, Spline().anchorDotSize, true, false)
                     anchorNextDotFirstIndex = Spline().getIndexOfDot(mainDotsList, startX, startY, Spline().anchorDotSize, false, true)

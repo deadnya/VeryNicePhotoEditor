@@ -59,11 +59,12 @@
         app:layout_constraintVertical_bias="0.819"
         app:srcCompat="@drawable/okay" />
 
-    <Button
+    <ImageButton
         android:id="@+id/uploadButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Upload Image"
+        android:src="@drawable/upload_image"
+        android:background="?android:attr/selectableItemBackground"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
