@@ -1,4 +1,4 @@
-package com.example.verynicephotoeditor.algorithms.task1
+package com.example.verynicephotoeditor.algorithms.task3
 import android.graphics.Bitmap
 import android.graphics.Color
 import kotlinx.coroutines.Dispatchers
