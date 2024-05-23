@@ -18,6 +18,7 @@ class Decode1Fragment : Fragment() {
 
     private lateinit var sharedViewModel: SharedViewModel
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
