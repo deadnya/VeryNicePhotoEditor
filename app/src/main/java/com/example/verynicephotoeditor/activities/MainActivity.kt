@@ -26,15 +26,18 @@ class MainActivity : AppCompatActivity()  {
             requestPermissions.launch(arrayOf(
                 Manifest.permission.READ_MEDIA_IMAGES,
                 Manifest.permission.READ_MEDIA_VIDEO,
-                Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
+                Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED,
+                Manifest.permission.CAMERA
             ))
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             requestPermissions.launch(arrayOf(
                 Manifest.permission.READ_MEDIA_IMAGES,
-                Manifest.permission.READ_MEDIA_VIDEO
+                Manifest.permission.READ_MEDIA_VIDEO,
+                Manifest.permission.CAMERA
             ))
         } else {
             requestPermissions.launch(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE))
+
         }
 
         binding = ActivityMainBinding.inflate(layoutInflater)

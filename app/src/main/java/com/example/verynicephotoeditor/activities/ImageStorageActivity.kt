@@ -123,7 +123,7 @@ class ImageStorageActivity : AppCompatActivity() {
             ButtonModel("Decode2"),
             ButtonModel("Encode3"),
             ButtonModel("Decode3"),
-            ButtonModel("Face gaRecognition"),
+            ButtonModel("Face Recognition"),
             ButtonModel("")
         )
         binding.galleryButton.setOnClickListener{
