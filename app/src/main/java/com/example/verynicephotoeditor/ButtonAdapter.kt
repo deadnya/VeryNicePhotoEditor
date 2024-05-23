@@ -6,6 +6,27 @@ import android.view.ViewGroup
 import androidx.fragment.app.FragmentManager
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.verynicephotoeditor.fragments.BlurFragment
+import com.example.verynicephotoeditor.fragments.ContrastFragment
+import com.example.verynicephotoeditor.fragments.Decode1Fragment
+import com.example.verynicephotoeditor.fragments.Decode2Fragment
+import com.example.verynicephotoeditor.fragments.Decode3Fragment
+import com.example.verynicephotoeditor.fragments.DitherFragment
+import com.example.verynicephotoeditor.fragments.EdgeFragment
+import com.example.verynicephotoeditor.fragments.EmbossFragment
+import com.example.verynicephotoeditor.fragments.Encode1Fragment
+import com.example.verynicephotoeditor.fragments.Encode2Fragment
+import com.example.verynicephotoeditor.fragments.Encode3Fragment
+import com.example.verynicephotoeditor.fragments.GlassFragment
+import com.example.verynicephotoeditor.fragments.GrayscaleFragment
+import com.example.verynicephotoeditor.fragments.MaskFragment
+import com.example.verynicephotoeditor.fragments.OilFragment
+import com.example.verynicephotoeditor.fragments.PixelateFragment
+import com.example.verynicephotoeditor.fragments.RotateFragment
+import com.example.verynicephotoeditor.fragments.ScaleFragment
+import com.example.verynicephotoeditor.fragments.SepiaFragment
+import com.example.verynicephotoeditor.fragments.SolarizeFragment
+import com.example.verynicephotoeditor.fragments.WaveFragment
 
 class ButtonAdapter(private val buttonList: List<ButtonModel>, private val fragmentManager: FragmentManager) : RecyclerView.Adapter<ButtonAdapter.ButtonViewHolder>() {
 

@@ -1,4 +1,4 @@
-package com.example.verynicephotoeditor
+package com.example.verynicephotoeditor.fragments
 
 import android.app.Activity
 import android.content.Intent
@@ -18,9 +18,12 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModelProvider
+import com.example.verynicephotoeditor.R
+import com.example.verynicephotoeditor.SharedViewModel
+import com.example.verynicephotoeditor.activities.MainActivity
 import com.example.verynicephotoeditor.algorithms.task2.Filters
 
-class Encode2Fragment : Fragment() {
+class Encode1Fragment : Fragment() {
 
     private lateinit var sharedViewModel: SharedViewModel
 
@@ -64,7 +67,7 @@ class Encode2Fragment : Fragment() {
 
             val bitmap = sharedViewModel.bitmap.value
             if (bitmap != null) {
-                val filteredBitmap = Filters().createSteganography(bitmap, uploadedBitmap)
+                val filteredBitmap = Filters().createSteganography50x50(bitmap, uploadedBitmap)
                 sharedViewModel.setBitmap(filteredBitmap)
             }
 
@@ -81,6 +84,6 @@ class Encode2Fragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_encode2, container, false)
+        return inflater.inflate(R.layout.fragment_encode1, container, false)
     }
 }

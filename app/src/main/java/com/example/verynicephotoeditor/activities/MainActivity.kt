@@ -1,9 +1,11 @@
-package com.example.verynicephotoeditor
+package com.example.verynicephotoeditor.activities
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.commit
+import com.example.verynicephotoeditor.fragments.MainMenuFragment
+import com.example.verynicephotoeditor.R
 import com.example.verynicephotoeditor.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity()  {

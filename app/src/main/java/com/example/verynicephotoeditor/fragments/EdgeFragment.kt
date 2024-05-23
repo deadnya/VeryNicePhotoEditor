@@ -1,4 +1,4 @@
-package com.example.verynicephotoeditor
+package com.example.verynicephotoeditor.fragments
 
 import android.content.Intent
 import android.os.Bundle
@@ -7,18 +7,34 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
 import android.widget.ImageButton
-import android.widget.Toast
+import android.widget.SeekBar
+import android.widget.TextView
 import androidx.lifecycle.ViewModelProvider
+import com.example.verynicephotoeditor.R
+import com.example.verynicephotoeditor.SharedViewModel
+import com.example.verynicephotoeditor.activities.MainActivity
 import com.example.verynicephotoeditor.algorithms.task2.Filters
 
-class Decode3Fragment : Fragment() {
+class EdgeFragment : Fragment() {
 
     private lateinit var sharedViewModel: SharedViewModel
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val seekBar = view.findViewById<SeekBar>(R.id.seekBar_b)
+        val seekBarValue = view.findViewById<TextView>(R.id.seekBarValue_a)
+
+        seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                seekBarValue.text = "Threshold: $progress"
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+        })
 
         val imageButton9 = view.findViewById<ImageButton>(R.id.imageButton9)
         imageButton9.setOnClickListener {
@@ -27,10 +43,11 @@ class Decode3Fragment : Fragment() {
 
             val bitmap = sharedViewModel.bitmap.value
             if (bitmap != null) {
-                Toast.makeText(requireContext(), Filters().decodeSteganographyText(bitmap), Toast.LENGTH_SHORT).show()
+                val filteredBitmap = Filters().applyEdgerator(bitmap, seekBar.progress)
+                sharedViewModel.setBitmap(filteredBitmap)
             }
 
-            Log.d("AAAA", "AAAA")
+            Log.d("AAAA", "AAAAAAAAAAA")
         }
 
         view.findViewById<ImageButton>(R.id.backPanel).setOnClickListener {
@@ -43,6 +60,6 @@ class Decode3Fragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_decode3, container, false)
+        return inflater.inflate(R.layout.fragment_edge, container, false)
     }
 }

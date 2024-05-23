@@ -1,4 +1,4 @@
-package com.example.verynicephotoeditor
+package com.example.verynicephotoeditor.fragments
 
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Switch
 import androidx.fragment.app.Fragment
+import com.example.verynicephotoeditor.R
 import com.example.verynicephotoeditor.algorithms.task5.MainDot
 import com.example.verynicephotoeditor.algorithms.task5.Spline
 import com.example.verynicephotoeditor.databinding.FragmentSplinesBinding

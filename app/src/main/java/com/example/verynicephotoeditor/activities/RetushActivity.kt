@@ -1,4 +1,4 @@
-package com.example.verynicephotoeditor
+package com.example.verynicephotoeditor.activities
 
 import android.annotation.SuppressLint
 import android.content.Intent

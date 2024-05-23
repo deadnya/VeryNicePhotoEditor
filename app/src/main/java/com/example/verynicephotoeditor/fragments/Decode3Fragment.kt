@@ -1,4 +1,4 @@
-package com.example.verynicephotoeditor
+package com.example.verynicephotoeditor.fragments
 
 import android.content.Intent
 import android.os.Bundle
@@ -8,10 +8,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
+import com.example.verynicephotoeditor.R
+import com.example.verynicephotoeditor.SharedViewModel
+import com.example.verynicephotoeditor.activities.MainActivity
 import com.example.verynicephotoeditor.algorithms.task2.Filters
 
-class DitherFragment : Fragment() {
+class Decode3Fragment : Fragment() {
 
     private lateinit var sharedViewModel: SharedViewModel
 
@@ -25,8 +29,7 @@ class DitherFragment : Fragment() {
 
             val bitmap = sharedViewModel.bitmap.value
             if (bitmap != null) {
-                val filteredBitmap = Filters().applyDither(bitmap)
-                sharedViewModel.setBitmap(filteredBitmap)
+                Toast.makeText(requireContext(), Filters().decodeSteganographyText(bitmap), Toast.LENGTH_SHORT).show()
             }
 
             Log.d("AAAA", "AAAA")
@@ -42,6 +45,6 @@ class DitherFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_dither, container, false)
+        return inflater.inflate(R.layout.fragment_decode3, container, false)
     }
 }

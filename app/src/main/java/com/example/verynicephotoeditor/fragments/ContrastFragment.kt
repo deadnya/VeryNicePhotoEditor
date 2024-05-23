@@ -1,4 +1,4 @@
-package com.example.verynicephotoeditor
+package com.example.verynicephotoeditor.fragments
 
 import android.content.Intent
 import android.os.Bundle
@@ -11,6 +11,9 @@ import android.widget.ImageButton
 import android.widget.SeekBar
 import android.widget.TextView
 import androidx.lifecycle.ViewModelProvider
+import com.example.verynicephotoeditor.R
+import com.example.verynicephotoeditor.SharedViewModel
+import com.example.verynicephotoeditor.activities.MainActivity
 import com.example.verynicephotoeditor.algorithms.task2.Filters
 
 class ContrastFragment : Fragment() {

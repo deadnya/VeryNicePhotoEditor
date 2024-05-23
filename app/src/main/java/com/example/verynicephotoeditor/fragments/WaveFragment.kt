@@ -1,4 +1,4 @@
-package com.example.verynicephotoeditor
+package com.example.verynicephotoeditor.fragments
 
 import android.content.Intent
 import android.os.Bundle
@@ -11,21 +11,37 @@ import android.widget.ImageButton
 import android.widget.SeekBar
 import android.widget.TextView
 import androidx.lifecycle.ViewModelProvider
+import com.example.verynicephotoeditor.R
+import com.example.verynicephotoeditor.SharedViewModel
+import com.example.verynicephotoeditor.activities.MainActivity
 import com.example.verynicephotoeditor.algorithms.task2.Filters
 
-class PixelateFragment : Fragment() {
+class WaveFragment : Fragment() {
 
     private lateinit var sharedViewModel: SharedViewModel
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val seekBar = view.findViewById<SeekBar>(R.id.seekBar_b)
-        val seekBarValue = view.findViewById<TextView>(R.id.seekBarValue_a)
+        val seekBar_a = view.findViewById<SeekBar>(R.id.seekBar_a)
+        val seekBarValue_a = view.findViewById<TextView>(R.id.seekBarValue_a)
 
-        seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        val seekBar_b = view.findViewById<SeekBar>(R.id.seekBar_b)
+        val seekBarValue_b = view.findViewById<TextView>(R.id.seekBarValue_b)
+
+        seekBar_a.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                seekBarValue.text = "Pixel size: $progress"
+                seekBarValue_a.text = "a: $progress"
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+        })
+
+        seekBar_b.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                seekBarValue_b.text = "b: $progress"
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -40,7 +56,7 @@ class PixelateFragment : Fragment() {
 
             val bitmap = sharedViewModel.bitmap.value
             if (bitmap != null) {
-                val filteredBitmap = Filters().pixelateBitmap(bitmap, seekBar.progress)
+                val filteredBitmap = Filters().applyWave(bitmap, seekBar_a.progress, seekBar_b.progress)
                 sharedViewModel.setBitmap(filteredBitmap)
             }
 
@@ -57,6 +73,6 @@ class PixelateFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_pixelate, container, false)
+        return inflater.inflate(R.layout.fragment_wave, container, false)
     }
 }

@@ -1,4 +1,4 @@
-package com.example.verynicephotoeditor
+package com.example.verynicephotoeditor.fragments
 
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.Manifest.permission.READ_MEDIA_IMAGES
@@ -20,8 +20,10 @@ import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.commit
-import com.example.verynicephotoeditor.algorithms.task9.SpinningCube
+import com.example.verynicephotoeditor.R
+import com.example.verynicephotoeditor.activities.AffineActivity
+import com.example.verynicephotoeditor.activities.ImageStorageActivity
+import com.example.verynicephotoeditor.activities.RetushActivity
 import com.example.verynicephotoeditor.databinding.FragmentMainMenuBinding
 import java.io.File
 import java.io.FileOutputStream

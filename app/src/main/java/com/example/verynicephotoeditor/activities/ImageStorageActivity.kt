@@ -1,4 +1,4 @@
-package com.example.verynicephotoeditor
+package com.example.verynicephotoeditor.activities
 
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.Manifest.permission.READ_MEDIA_IMAGES
@@ -14,6 +14,11 @@ import androidx.fragment.app.commit
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.verynicephotoeditor.ButtonAdapter
+import com.example.verynicephotoeditor.ButtonModel
+import com.example.verynicephotoeditor.R
+import com.example.verynicephotoeditor.fragments.RotateFragment
+import com.example.verynicephotoeditor.SharedViewModel
 import com.example.verynicephotoeditor.databinding.ActivityImageStorageBinding
 
 

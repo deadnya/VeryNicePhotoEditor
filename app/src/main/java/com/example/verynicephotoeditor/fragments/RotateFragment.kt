@@ -1,4 +1,4 @@
-package com.example.verynicephotoeditor
+package com.example.verynicephotoeditor.fragments
 
 import android.content.Intent
 import android.os.Bundle
@@ -7,8 +7,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import com.example.verynicephotoeditor.R
+import com.example.verynicephotoeditor.activities.MainActivity
 
-class ScaleFragment : Fragment() {
+
+class RotateFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -19,10 +22,13 @@ class ScaleFragment : Fragment() {
         }
     }
 
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_scale, container, false)
+        return inflater.inflate(R.layout.fragment_rotate, container, false)
+
     }
 }

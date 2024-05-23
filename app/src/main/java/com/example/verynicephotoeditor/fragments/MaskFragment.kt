@@ -1,4 +1,4 @@
-package com.example.verynicephotoeditor
+package com.example.verynicephotoeditor.fragments
 
 import android.content.Intent
 import android.os.Bundle
@@ -11,21 +11,44 @@ import android.widget.ImageButton
 import android.widget.SeekBar
 import android.widget.TextView
 import androidx.lifecycle.ViewModelProvider
+import com.example.verynicephotoeditor.R
+import com.example.verynicephotoeditor.SharedViewModel
+import com.example.verynicephotoeditor.activities.MainActivity
 import com.example.verynicephotoeditor.algorithms.task2.Filters
 
-class SepiaFragment : Fragment() {
+class MaskFragment : Fragment() {
 
     private lateinit var sharedViewModel: SharedViewModel
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val seekBar = view.findViewById<SeekBar>(R.id.seekBar_b)
-        val seekBarValue = view.findViewById<TextView>(R.id.seekBarValue_a)
+        val seekBar_str = view.findViewById<SeekBar>(R.id.seekBar_str)
+        val seekBarValue_str = view.findViewById<TextView>(R.id.seekBarValue_str)
 
-        seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        val seekBar_rad = view.findViewById<SeekBar>(R.id.seekBar_rad)
+        val seekBarValue_rad = view.findViewById<TextView>(R.id.seekBarValue_rad)
+        var actualProgress = 3
+
+        seekBar_str.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                seekBarValue.text = "Value: $progress"
+                seekBarValue_str.text = "Strength: ${progress / 100.0f}"
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+        })
+
+        seekBar_rad.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                actualProgress = progress
+
+                if (progress % 2 == 0) {
+                    actualProgress++
+                }
+
+                seekBarValue_rad.text = "Radius: $actualProgress"
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -40,7 +63,7 @@ class SepiaFragment : Fragment() {
 
             val bitmap = sharedViewModel.bitmap.value
             if (bitmap != null) {
-                val filteredBitmap = Filters().applySepia(bitmap, seekBar.progress.toDouble())
+                val filteredBitmap = Filters().applyUnsharpMask(bitmap, seekBar_str.progress / 100.0, actualProgress)
                 sharedViewModel.setBitmap(filteredBitmap)
             }
 
@@ -57,6 +80,6 @@ class SepiaFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_sepia, container, false)
+        return inflater.inflate(R.layout.fragment_mask, container, false)
     }
 }

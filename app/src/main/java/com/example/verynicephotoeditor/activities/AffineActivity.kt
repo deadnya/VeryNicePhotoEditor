@@ -1,4 +1,4 @@
-package com.example.verynicephotoeditor
+package com.example.verynicephotoeditor.activities
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -8,8 +8,6 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.MotionEvent
 import androidx.appcompat.app.AppCompatActivity
-import com.example.verynicephotoeditor.algorithms.task2.Filters
-import com.example.verynicephotoeditor.algorithms.task6.Retush
 import com.example.verynicephotoeditor.algorithms.task8.Affines
 import com.example.verynicephotoeditor.algorithms.task8.Dot
 import com.example.verynicephotoeditor.databinding.ActivityAffinesBinding

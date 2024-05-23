@@ -1,4 +1,4 @@
-package com.example.verynicephotoeditor
+package com.example.verynicephotoeditor.fragments
 
 import android.content.Intent
 import android.os.Bundle
@@ -9,9 +9,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import androidx.lifecycle.ViewModelProvider
+import com.example.verynicephotoeditor.R
+import com.example.verynicephotoeditor.SharedViewModel
+import com.example.verynicephotoeditor.activities.MainActivity
 import com.example.verynicephotoeditor.algorithms.task2.Filters
 
-class Decode2Fragment : Fragment() {
+class GrayscaleFragment : Fragment() {
 
     private lateinit var sharedViewModel: SharedViewModel
 
@@ -25,7 +28,7 @@ class Decode2Fragment : Fragment() {
 
             val bitmap = sharedViewModel.bitmap.value
             if (bitmap != null) {
-                val filteredBitmap = Filters().decodeSteganography(bitmap)
+                val filteredBitmap = Filters().applyGrayscaleFilter(bitmap)
                 sharedViewModel.setBitmap(filteredBitmap)
             }
 
@@ -42,6 +45,6 @@ class Decode2Fragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_decode2, container, false)
+        return inflater.inflate(R.layout.fragment_grayscale, container, false)
     }
 }

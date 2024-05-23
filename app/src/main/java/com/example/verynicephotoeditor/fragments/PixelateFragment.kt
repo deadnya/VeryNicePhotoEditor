@@ -1,4 +1,4 @@
-package com.example.verynicephotoeditor
+package com.example.verynicephotoeditor.fragments
 
 import android.content.Intent
 import android.os.Bundle
@@ -11,9 +11,12 @@ import android.widget.ImageButton
 import android.widget.SeekBar
 import android.widget.TextView
 import androidx.lifecycle.ViewModelProvider
+import com.example.verynicephotoeditor.R
+import com.example.verynicephotoeditor.SharedViewModel
+import com.example.verynicephotoeditor.activities.MainActivity
 import com.example.verynicephotoeditor.algorithms.task2.Filters
 
-class EdgeFragment : Fragment() {
+class PixelateFragment : Fragment() {
 
     private lateinit var sharedViewModel: SharedViewModel
 
@@ -25,7 +28,7 @@ class EdgeFragment : Fragment() {
 
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                seekBarValue.text = "Threshold: $progress"
+                seekBarValue.text = "Pixel size: $progress"
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -40,7 +43,7 @@ class EdgeFragment : Fragment() {
 
             val bitmap = sharedViewModel.bitmap.value
             if (bitmap != null) {
-                val filteredBitmap = Filters().applyEdgerator(bitmap, seekBar.progress)
+                val filteredBitmap = Filters().pixelateBitmap(bitmap, seekBar.progress)
                 sharedViewModel.setBitmap(filteredBitmap)
             }
 
@@ -57,6 +60,6 @@ class EdgeFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_edge, container, false)
+        return inflater.inflate(R.layout.fragment_pixelate, container, false)
     }
 }

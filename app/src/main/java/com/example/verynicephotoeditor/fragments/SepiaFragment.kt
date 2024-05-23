@@ -1,4 +1,4 @@
-package com.example.verynicephotoeditor
+package com.example.verynicephotoeditor.fragments
 
 import android.content.Intent
 import android.os.Bundle
@@ -11,9 +11,12 @@ import android.widget.ImageButton
 import android.widget.SeekBar
 import android.widget.TextView
 import androidx.lifecycle.ViewModelProvider
+import com.example.verynicephotoeditor.R
+import com.example.verynicephotoeditor.SharedViewModel
+import com.example.verynicephotoeditor.activities.MainActivity
 import com.example.verynicephotoeditor.algorithms.task2.Filters
 
-class OilFragment : Fragment() {
+class SepiaFragment : Fragment() {
 
     private lateinit var sharedViewModel: SharedViewModel
 
@@ -25,7 +28,7 @@ class OilFragment : Fragment() {
 
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                seekBarValue.text = "Neighbourhood: $progress"
+                seekBarValue.text = "Value: $progress"
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -40,7 +43,7 @@ class OilFragment : Fragment() {
 
             val bitmap = sharedViewModel.bitmap.value
             if (bitmap != null) {
-                val filteredBitmap = Filters().applyOilPaint(bitmap, seekBar.progress)
+                val filteredBitmap = Filters().applySepia(bitmap, seekBar.progress.toDouble())
                 sharedViewModel.setBitmap(filteredBitmap)
             }
 
@@ -57,6 +60,6 @@ class OilFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_oil, container, false)
+        return inflater.inflate(R.layout.fragment_sepia, container, false)
     }
 }

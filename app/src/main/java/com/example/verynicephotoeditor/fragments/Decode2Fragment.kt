@@ -1,4 +1,4 @@
-package com.example.verynicephotoeditor
+package com.example.verynicephotoeditor.fragments
 
 import android.content.Intent
 import android.os.Bundle
@@ -8,38 +8,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
-import android.widget.SeekBar
-import android.widget.TextView
 import androidx.lifecycle.ViewModelProvider
+import com.example.verynicephotoeditor.R
+import com.example.verynicephotoeditor.SharedViewModel
+import com.example.verynicephotoeditor.activities.MainActivity
 import com.example.verynicephotoeditor.algorithms.task2.Filters
 
-class BlurFragment : Fragment() {
+class Decode2Fragment : Fragment() {
 
     private lateinit var sharedViewModel: SharedViewModel
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val seekBar = view.findViewById<SeekBar>(R.id.seekBar_b)
-        val seekBarValue = view.findViewById<TextView>(R.id.seekBarValue_a)
-        var actualProgress = 3
-
-        seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-
-                actualProgress = progress
-
-                if (progress % 2 == 0) {
-                    actualProgress++
-                }
-
-                seekBarValue.text = "Kernel size: $actualProgress"
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-        })
 
         val imageButton9 = view.findViewById<ImageButton>(R.id.imageButton9)
         imageButton9.setOnClickListener {
@@ -48,11 +28,11 @@ class BlurFragment : Fragment() {
 
             val bitmap = sharedViewModel.bitmap.value
             if (bitmap != null) {
-                val filteredBitmap = Filters().applyGaussBlur(bitmap, actualProgress)
+                val filteredBitmap = Filters().decodeSteganography(bitmap)
                 sharedViewModel.setBitmap(filteredBitmap)
             }
 
-            Log.d("AAAA", "AAAAAAAAAAA")
+            Log.d("AAAA", "AAAA")
         }
 
         view.findViewById<ImageButton>(R.id.backPanel).setOnClickListener {
@@ -65,6 +45,6 @@ class BlurFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_blur, container, false)
+        return inflater.inflate(R.layout.fragment_decode2, container, false)
     }
 }
