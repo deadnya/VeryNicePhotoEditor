@@ -17,6 +17,7 @@ import com.example.verynicephotoeditor.fragments.EmbossFragment
 import com.example.verynicephotoeditor.fragments.Encode1Fragment
 import com.example.verynicephotoeditor.fragments.Encode2Fragment
 import com.example.verynicephotoeditor.fragments.Encode3Fragment
+import com.example.verynicephotoeditor.fragments.FaceRecognitionFragment
 import com.example.verynicephotoeditor.fragments.GlassFragment
 import com.example.verynicephotoeditor.fragments.GrayscaleFragment
 import com.example.verynicephotoeditor.fragments.MaskFragment
@@ -66,6 +67,7 @@ class ButtonAdapter(private val buttonList: List<ButtonModel>, private val fragm
                 "Decode2" -> Decode2Fragment()
                 "Encode3" -> Encode3Fragment()
                 "Decode3" -> Decode3Fragment()
+                "Face Recognition"-> FaceRecognitionFragment()
                 else -> null
             }
 

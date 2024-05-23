@@ -54,7 +54,7 @@ class Encode1Fragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val uploadButton = view.findViewById<Button>(R.id.uploadButton)
+        val uploadButton = view.findViewById<ImageButton>(R.id.uploadButton)
         uploadButton.setOnClickListener {
             val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
             pickImage.launch(intent)
@@ -63,7 +63,7 @@ class Encode1Fragment : Fragment() {
         val imageButton9 = view.findViewById<ImageButton>(R.id.imageButton9)
         imageButton9.setOnClickListener {
 
-            sharedViewModel = ViewModelProvider(requireActivity()).get(SharedViewModel::class.java)
+            sharedViewModel = ViewModelProvider(requireActivity())[SharedViewModel::class.java]
 
             val bitmap = sharedViewModel.bitmap.value
             if (bitmap != null) {
