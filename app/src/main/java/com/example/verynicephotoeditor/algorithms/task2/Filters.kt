@@ -5,8 +5,6 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
-import androidx.core.content.res.ResourcesCompat
-import com.example.verynicephotoeditor.R
 import kotlin.math.PI
 import kotlin.math.exp
 import kotlin.math.pow
@@ -14,6 +12,13 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 import kotlin.math.truncate
 import kotlin.random.Random
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+
 
 class Filters {
 
@@ -21,8 +26,7 @@ class Filters {
         return (0.299 * red + 0.587 * green + 0.114 * blue).toInt()
     }
 
-    fun applyGrayscaleFilter(bitmap: Bitmap): Bitmap {
-
+    suspend fun applyGrayscaleFilter(bitmap: Bitmap): Bitmap = withContext(Dispatchers.Default) {
         val width = bitmap.width
         val height = bitmap.height
 
@@ -31,23 +35,26 @@ class Filters {
 
         val destPixels = IntArray(width * height)
 
-        for (i in srcPixels.indices) {
+        coroutineScope {
+            for (i in srcPixels.indices) {
+                launch {
+                    val pixel = srcPixels[i]
 
-            val pixel = srcPixels[i]
+                    val gray = getGrayscaleValue(
+                        Color.red(pixel),
+                        Color.green(pixel),
+                        Color.blue(pixel)
+                    )
 
-            val gray = getGrayscaleValue(
-                Color.red(pixel),
-                Color.green(pixel),
-                Color.blue(pixel)
-            )
-
-            destPixels[i] = Color.argb(Color.alpha(pixel), gray, gray, gray)
+                    destPixels[i] = Color.argb(Color.alpha(pixel), gray, gray, gray)
+                }
+            }
         }
 
         val destBitmap = Bitmap.createBitmap(width, height, bitmap.config)
         destBitmap.setPixels(destPixels, 0, width, 0, 0, width, height)
 
-        return destBitmap
+        return@withContext destBitmap
     }
 
     fun drawableToBitmap(drawable: Drawable): Bitmap {
@@ -135,84 +142,85 @@ class Filters {
         return newBitmap
     }
 
-    fun applySepia(bitmap: Bitmap, value: Double): Bitmap {
-
-        //50-100 value is best
+    suspend fun applySepia(bitmap: Bitmap, value: Double): Bitmap = withContext(Dispatchers.Default) {
 
         val width = bitmap.width
         val height = bitmap.height
 
         val sepiaValue: Double = value * 255.0 / 100.0
-        val sepiaValue_76 = 7.0 * sepiaValue / 6.0
-        val sepiaValue_16 = sepiaValue / 6.0
-        val sepiaValue_17 = sepiaValue / 7.0
+        val sepiaValue76 = 7.0 * sepiaValue / 6.0
+        val sepiaValue16 = sepiaValue / 6.0
+        val sepiaValue17 = sepiaValue / 7.0
 
         val srcPixels = IntArray(width * height)
         bitmap.getPixels(srcPixels, 0, width, 0, 0, width, height)
 
         val destPixels = IntArray(width * height)
 
-        for (i in srcPixels.indices) {
+        val jobs = List(srcPixels.size) { i ->
+            async {
+                val pixel = srcPixels[i]
 
-            val pixel = srcPixels[i]
+                var tonality = 0.0
 
-            var tonality = 0.0
+                val gray = getGrayscaleValue(
+                    Color.red(pixel),
+                    Color.green(pixel),
+                    Color.blue(pixel)
+                )
 
-            val gray = getGrayscaleValue(
-                Color.red(pixel),
-                Color.green(pixel),
-                Color.blue(pixel)
-            )
+                tonality = if (gray > sepiaValue) {
+                    255.0
+                } else {
+                    gray + 255.0 - sepiaValue;
+                }
+                val newRed = tonality
 
-            if (gray > sepiaValue) {
-                tonality = 255.0
-            } else {
-                tonality = gray + 255.0 - sepiaValue;
+                tonality = if (gray > sepiaValue76) {
+                    255.0
+                } else {
+                    gray + 255.0 - sepiaValue76
+                }
+                var newGreen = tonality
+
+                if (newGreen < sepiaValue17) {
+                    newGreen = sepiaValue17
+                }
+
+                tonality = if (gray < sepiaValue16) {
+                    0.0
+                } else {
+                    gray - sepiaValue16
+                }
+                var newBlue = tonality
+
+                if (newBlue < sepiaValue17) {
+                    newBlue = sepiaValue17
+                }
+
+                destPixels[i] = Color.argb(
+                    Color.alpha(pixel),
+                    newRed.toInt(),
+                    newGreen.toInt(),
+                    newBlue.toInt()
+                )
             }
-            val newRed = tonality
-
-            if (gray > sepiaValue_76) {
-                tonality = 255.0
-            } else {
-                tonality = gray + 255.0 - sepiaValue_76
-            }
-            var newGreen = tonality
-
-            if (newGreen < sepiaValue_17) {
-                newGreen = sepiaValue_17
-            }
-
-            if (gray < sepiaValue_16) {
-                tonality = 0.0
-            } else {
-                tonality = gray - sepiaValue_16
-            }
-            var newBlue = tonality
-
-            if (newBlue < sepiaValue_17) {
-                newBlue = sepiaValue_17
-            }
-
-            destPixels[i] = Color.argb(
-                Color.alpha(pixel),
-                newRed.toInt(),
-                newGreen.toInt(),
-                newBlue.toInt()
-            )
         }
+
+        jobs.forEach { it.await() }
 
         val destBitmap = Bitmap.createBitmap(width, height, bitmap.config)
         destBitmap.setPixels(destPixels, 0, width, 0, 0, width, height)
 
-        return destBitmap
+        return@withContext destBitmap
     }
 
-    fun applySolarize(
+    suspend fun applySolarize(
         bitmap: Bitmap,
         valueRed: Int,
         valueGreen: Int,
         valueBlue: Int
-    ): Bitmap {
+    ): Bitmap = withContext(Dispatchers.Default) {
 
         val width = bitmap.width
         val height = bitmap.height
@@ -253,10 +261,10 @@ class Filters {
         val destBitmap = Bitmap.createBitmap(width, height, bitmap.config)
         destBitmap.setPixels(destPixels, 0, width, 0, 0, width, height)
 
-        return destBitmap
+        return@withContext destBitmap
     }
 
-    fun applyPaperize(bitmap: Bitmap, canvasBitmap: Bitmap): Bitmap {
+    suspend fun applyPaperize(bitmap: Bitmap, canvasBitmap: Bitmap): Bitmap {
 
         val width = bitmap.width
         val height = bitmap.height
@@ -302,7 +310,7 @@ class Filters {
         return destBitmap
     }
 
-    fun applyDither(bitmap: Bitmap): Bitmap {
+    suspend fun applyDither(bitmap: Bitmap): Bitmap = withContext(Dispatchers.Default) {
 
         val ditherMatrix = arrayOf(
             96, 128, 160, 16,
@@ -318,8 +326,8 @@ class Filters {
 
         val destPixels = IntArray(width * height)
 
-        for (x in 0..<width) {
-            for (y in 0..<height) {
+        for (x in 0 until width) {
+            for (y in 0 until height) {
 
                 val pixel = grayscaledBitmap.getPixel(x, y)
 
@@ -331,7 +339,7 @@ class Filters {
 
                 val matrixValue = ditherMatrix[(y % 4) * 4 + (x % 4)]
 
-                var newVal = 0;
+                var newVal = 0
 
                 if (gray > matrixValue) {
                     newVal = gray
@@ -349,10 +357,10 @@ class Filters {
         val destBitmap = Bitmap.createBitmap(width, height, bitmap.config)
         destBitmap.setPixels(destPixels, 0, width, 0, 0, width, height)
 
-        return destBitmap
+        return@withContext destBitmap
     }
 
-    fun applyEdgerator(bitmap: Bitmap, minMagnitude: Int): Bitmap {
+    suspend fun applyEdgerator(bitmap: Bitmap, minMagnitude: Int): Bitmap = withContext(Dispatchers.Default) {
 
         val grayscaledBitmap = applyGaussBlur(applyGrayscaleFilter(bitmap), 3)
 
@@ -374,8 +382,8 @@ class Filters {
             arrayOf(-1, -2, -1)
         )
 
-        for (x in 0..<width) {
-            for (y in 0..<height) {
+        for (x in 0 until width) {
+            for (y in 0 until height) {
 
                 val pixel = grayscaledBitmap.getPixel(x, y)
 
@@ -425,7 +433,7 @@ class Filters {
 
         destBitmap.setPixels(destPixels, 0, width, 0, 0, width, height)
 
-        return destBitmap
+        return@withContext destBitmap
     }
 
     private fun gaussianFunction(x: Double, y: Double, sigma: Double = 1.0): Double {
@@ -571,62 +579,63 @@ class Filters {
         return mode
     }
 
-    fun applyOilPaint(bitmap: Bitmap, neighbourhood: Int): Bitmap {
-
+    suspend fun applyOilPaint(bitmap: Bitmap, neighbourhood: Int): Bitmap = withContext(Dispatchers.Default) {
         val width = bitmap.width
         val height = bitmap.height
 
         val destBitmap = Bitmap.createBitmap(width, height, bitmap.config)
         val destPixels = IntArray(width * height)
 
-        for (x in 0..<width) {
-            for (y in 0..<height) {
+        coroutineScope {
+            for (x in 0 until width) {
+                for (y in 0 until height) {
+                    launch {
+                        val pixel = bitmap.getPixel(x, y)
 
-                val pixel = bitmap.getPixel(x, y)
+                        val redList = MutableList((neighbourhood * 2 + 1) * (neighbourhood * 2 + 1)) { 0 }
+                        val greenList = MutableList((neighbourhood * 2 + 1) * (neighbourhood * 2 + 1)) { 0 }
+                        val blueList = MutableList((neighbourhood * 2 + 1) * (neighbourhood * 2 + 1)) { 0 }
 
-                val redList = MutableList((neighbourhood * 2 + 1) * (neighbourhood * 2 + 1)) { 0 }
-                val greenList = MutableList((neighbourhood * 2 + 1) * (neighbourhood * 2 + 1)) { 0 }
-                val blueList = MutableList((neighbourhood * 2 + 1) * (neighbourhood * 2 + 1)) { 0 }
+                        for (xx in x - neighbourhood..x + neighbourhood) {
+                            for (yy in y - neighbourhood..y + neighbourhood) {
 
-                for (xx in x - neighbourhood..x + neighbourhood) {
-                    for (yy in y - neighbourhood..y + neighbourhood) {
+                                val currX = Math.max(Math.min(bitmap.width - 1, xx), 0)
+                                val currY = Math.max(Math.min(bitmap.height - 1, yy), 0)
 
-                        val currX = Math.max(Math.min(bitmap.width - 1, xx), 0)
-                        val currY = Math.max(Math.min(bitmap.height - 1, yy), 0)
+                                val currPixel = bitmap.getPixel(currX, currY)
 
-                        val currPixel = bitmap.getPixel(currX, currY)
+                                redList[(yy - y + neighbourhood) * (neighbourhood * 2 + 1) + xx - x + neighbourhood] =
+                                    Color.red(currPixel)
+                                greenList[(yy - y + neighbourhood) * (neighbourhood * 2 + 1) + xx - x + neighbourhood] =
+                                    Color.green(currPixel)
+                                blueList[(yy - y + neighbourhood) * (neighbourhood * 2 + 1) + xx - x + neighbourhood] =
+                                    Color.blue(currPixel)
+                            }
+                        }
 
-                        redList[(yy - y + neighbourhood) * (neighbourhood * 2 + 1) + xx - x + neighbourhood] =
-                            Color.red(currPixel)
-                        greenList[(yy - y + neighbourhood) * (neighbourhood * 2 + 1) + xx - x + neighbourhood] =
-                            Color.green(currPixel)
-                        blueList[(yy - y + neighbourhood) * (neighbourhood * 2 + 1) + xx - x + neighbourhood] =
-                            Color.blue(currPixel)
+                        val (modeRed, _) = redList.groupingBy { it }.eachCount().maxByOrNull { it.value }!!
+                        val (modeGreen, _) = greenList.groupingBy { it }.eachCount()
+                            .maxByOrNull { it.value }!!
+                        val (modeBlue, _) = blueList.groupingBy { it }.eachCount()
+                            .maxByOrNull { it.value }!!
+
+                        destPixels[y * width + x] = Color.argb(
+                            Color.alpha(pixel),
+                            modeRed,
+                            modeGreen,
+                            modeBlue
+                        )
                     }
                 }
-
-                val (modeRed, _) = redList.groupingBy { it }.eachCount().maxByOrNull { it.value }!!
-                val (modeGreen, _) = greenList.groupingBy { it }.eachCount()
-                    .maxByOrNull { it.value }!!
-                val (modeBlue, _) = blueList.groupingBy { it }.eachCount()
-                    .maxByOrNull { it.value }!!
-
-                destPixels[y * width + x] = Color.argb(
-                    Color.alpha(pixel),
-                    modeRed,
-                    modeGreen,
-                    modeBlue
-                )
             }
         }
 
         destBitmap.setPixels(destPixels, 0, width, 0, 0, width, height)
 
-        return destBitmap
+        return@withContext destBitmap
     }
 
-    fun applyEmbossFilter(bitmap: Bitmap): Bitmap {
-
+    suspend fun applyEmbossFilter(bitmap: Bitmap): Bitmap = withContext(Dispatchers.Default) {
         val width = bitmap.width
         val height = bitmap.height
 
@@ -641,72 +650,76 @@ class Filters {
         val destBitmap = Bitmap.createBitmap(width, height, bitmap.config)
         val destPixels = IntArray(width * height)
 
-        for (x in 0..<width) {
-            for (y in 0..<height) {
+        coroutineScope {
+            for (x in 0 until width) {
+                for (y in 0 until height) {
+                    launch {
+                        val pixel = grayscaledBitmap.getPixel(x, y)
 
-                val pixel = grayscaledBitmap.getPixel(x, y)
+                        var sum = 0
 
-                var sum = 0;
+                        for (xx in x - 1..x + 1) {
+                            for (yy in y - 1..y + 1) {
 
-                for (xx in x - 1..x + 1) {
-                    for (yy in y - 1..y + 1) {
+                                val currX = Math.max(Math.min(bitmap.width - 1, xx), 0)
+                                val currY = Math.max(Math.min(bitmap.height - 1, yy), 0)
 
-                        val currX = Math.max(Math.min(bitmap.width - 1, xx), 0)
-                        val currY = Math.max(Math.min(bitmap.height - 1, yy), 0)
+                                val currPixel = grayscaledBitmap.getPixel(currX, currY)
 
-                        val currPixel = grayscaledBitmap.getPixel(currX, currY)
+                                sum += embossMatrix[yy - y + 1][xx - x + 1] * Color.red(currPixel)
+                            }
+                        }
 
-                        sum += embossMatrix[yy - y + 1][xx - x + 1] * Color.red(currPixel)
+                        sum = Math.max(Math.min(255, sum), 0)
+
+                        destPixels[y * width + x] = Color.argb(
+                            Color.alpha(pixel),
+                            sum,
+                            sum,
+                            sum
+                        )
                     }
                 }
-
-                sum = Math.max(Math.min(255, sum), 0)
-
-                destPixels[y * width + x] = Color.argb(
-                    Color.alpha(pixel),
-                    sum,
-                    sum,
-                    sum
-                )
             }
         }
 
         destBitmap.setPixels(destPixels, 0, width, 0, 0, width, height)
 
-        return destBitmap
+        return@withContext destBitmap
     }
 
-    fun applyWave(bitmap: Bitmap, a: Int, b: Int): Bitmap {
-
+    suspend fun applyWave(bitmap: Bitmap, a: Int, b: Int): Bitmap = withContext(Dispatchers.Default) {
         val width = bitmap.width
         val height = bitmap.height
 
         val destBitmap = Bitmap.createBitmap(width, height, bitmap.config)
 
-        for (x in 0..<width) {
-            for (y in 0..<height) {
+        coroutineScope {
+            for (x in 0 until width) {
+                for (y in 0 until height) {
+                    launch {
+                        val currX = Math.max(
+                            Math.min(
+                                Math.round(x + a * sin(2 * PI * y / b)),
+                                (width - 1).toLong()
+                            ), 0
+                        )
+                        val currY = y
 
-                val currX = Math.max(
-                    Math.min(
-                        Math.round(x + a * sin(2 * PI * y / b)),
-                        (width - 1).toLong()
-                    ), 0
-                )
-                val currY = y
-
-                destBitmap.setPixel(
-                    x,
-                    y,
-                    bitmap.getPixel(currX.toInt(), currY)
-                )
+                        destBitmap.setPixel(
+                            x,
+                            y,
+                            bitmap.getPixel(currX.toInt(), currY)
+                        )
+                    }
+                }
             }
         }
 
-        return destBitmap
+        return@withContext destBitmap
     }
 
-    fun createSteganography50x50(bitmap: Bitmap, bitmapToEncrypt: Bitmap): Bitmap {
-
+    suspend fun createSteganography50x50(bitmap: Bitmap, bitmapToEncrypt: Bitmap): Bitmap = withContext(Dispatchers.Default) {
         val secretImage = bitmapToEncrypt
 
         val secretImageResized =
@@ -714,76 +727,83 @@ class Filters {
 
         val resultImage = Bitmap.createBitmap(bitmap.width, bitmap.height, bitmap.config)
 
-        for (x in 0 until bitmap.width) {
-            for (y in 0 until bitmap.height) {
+        coroutineScope {
+            for (x in 0 until bitmap.width) {
+                for (y in 0 until bitmap.height) {
+                    launch {
+                        val coverPixel = bitmap.getPixel(x, y)
+                        val secretPixel = secretImageResized.getPixel(x, y)
 
-                val coverPixel = bitmap.getPixel(x, y)
-                val secretPixel = secretImageResized.getPixel(x, y)
+                        val rgbValues = mutableListOf(
+                            addLeadingZeros(Integer.toBinaryString(Color.red(coverPixel)), 8),
+                            addLeadingZeros(Integer.toBinaryString(Color.green(coverPixel)), 8),
+                            addLeadingZeros(Integer.toBinaryString(Color.blue(coverPixel)), 8)
+                        )
 
-                val rgbValues = mutableListOf(
-                    addLeadingZeros(Integer.toBinaryString(Color.red(coverPixel)), 8),
-                    addLeadingZeros(Integer.toBinaryString(Color.green(coverPixel)), 8),
-                    addLeadingZeros(Integer.toBinaryString(Color.blue(coverPixel)), 8)
-                )
+                        val grayscale = getGrayscaleValue(
+                            Color.red(secretPixel),
+                            Color.green(secretPixel),
+                            Color.blue(secretPixel)
+                        )
 
-                val grayscale = getGrayscaleValue(
-                    Color.red(secretPixel),
-                    Color.green(secretPixel),
-                    Color.blue(secretPixel)
-                )
+                        val isCloserToWhite = grayscale > 128
 
-                val isCloserToWhite = grayscale > 128
+                        val resultPixel = if (isCloserToWhite) {
+                            Color.argb(
+                                Color.alpha(coverPixel),
+                                removeLeadingZeros(rgbValues[0]).toInt(2),
+                                removeLeadingZeros(rgbValues[1]).toInt(2),
+                                removeLeadingZeros(replaceChar(rgbValues[2], '1', 7)).toInt(2)
+                            )
+                        } else {
+                            Color.argb(
+                                Color.alpha(coverPixel),
+                                removeLeadingZeros(rgbValues[0]).toInt(2),
+                                removeLeadingZeros(rgbValues[1]).toInt(2),
+                                removeLeadingZeros(replaceChar(rgbValues[2], '0', 7)).toInt(2)
+                            )
+                        }
 
-                val resultPixel = if (isCloserToWhite) {
-                    Color.argb(
-                        Color.alpha(coverPixel),
-                        removeLeadingZeros(rgbValues[0]).toInt(2),
-                        removeLeadingZeros(rgbValues[1]).toInt(2),
-                        removeLeadingZeros(replaceChar(rgbValues[2], '1', 7)).toInt(2)
-                    )
-                } else {
-                    Color.argb(
-                        Color.alpha(coverPixel),
-                        removeLeadingZeros(rgbValues[0]).toInt(2),
-                        removeLeadingZeros(rgbValues[1]).toInt(2),
-                        removeLeadingZeros(replaceChar(rgbValues[2], '0', 7)).toInt(2)
-                    )
+                        resultImage.setPixel(x, y, resultPixel)
+                    }
                 }
-
-                resultImage.setPixel(x, y, resultPixel)
             }
         }
 
-        return resultImage
+        return@withContext resultImage
     }
 
-    fun decodeSteganography50x50(bitmap: Bitmap): Bitmap {
+    suspend fun decodeSteganography50x50(bitmap: Bitmap): Bitmap = withContext(Dispatchers.Default) {
+        val width = bitmap.width
+        val height = bitmap.height
 
-        val resultImage = Bitmap.createBitmap(bitmap.width, bitmap.height, bitmap.config)
+        val resultImage = Bitmap.createBitmap(width, height, bitmap.config)
 
-        for (x in 0 until bitmap.width) {
-            for (y in 0 until bitmap.height) {
+        coroutineScope {
+            for (x in 0 until width) {
+                for (y in 0 until height) {
+                    launch {
+                        val steganographyPixel = bitmap.getPixel(x, y)
 
-                val steganographyPixel = bitmap.getPixel(x, y)
+                        val encodedInfo =
+                            addLeadingZeros(Integer.toBinaryString(Color.blue(steganographyPixel)), 8)[7]
 
-                val encodedInfo =
-                    addLeadingZeros(Integer.toBinaryString(Color.blue(steganographyPixel)), 8)[7]
+                        val resultPixel = if (encodedInfo == '1') {
+                            Color.WHITE
+                        } else {
+                            Color.BLACK
+                        }
 
-                val resultPixel = if (encodedInfo == '1') {
-                    Color.WHITE
-                } else {
-                    Color.BLACK
+                        resultImage.setPixel(x, y, resultPixel)
+                    }
                 }
-
-                resultImage.setPixel(x, y, resultPixel)
             }
         }
 
-        return resultImage
+        return@withContext resultImage
     }
 
-    fun createSteganography(bitmap: Bitmap, bitmapToEncrypt: Bitmap): Bitmap {
-
+    suspend fun createSteganography(bitmap: Bitmap, bitmapToEncrypt: Bitmap): Bitmap = withContext(Dispatchers.Default) {
         val secretImage = bitmapToEncrypt
 
         val secretImageResized =
@@ -791,242 +811,249 @@ class Filters {
 
         val resultImage = Bitmap.createBitmap(bitmap.width, bitmap.height, bitmap.config)
 
-        for (x in 0 until bitmap.width) {
-            for (y in 0 until bitmap.height) {
+        coroutineScope {
+            for (x in 0 until bitmap.width) {
+                for (y in 0 until bitmap.height) {
+                    launch {
+                        val coverPixel = bitmap.getPixel(x, y)
+                        val secretPixel = secretImageResized.getPixel(x, y)
 
-                val coverPixel = bitmap.getPixel(x, y)
-                val secretPixel = secretImageResized.getPixel(x, y)
+                        val rgbValues = mutableListOf(
+                            addLeadingZeros(Integer.toBinaryString(Color.red(coverPixel)), 8),
+                            addLeadingZeros(Integer.toBinaryString(Color.green(coverPixel)), 8),
+                            addLeadingZeros(Integer.toBinaryString(Color.blue(coverPixel)), 8)
+                        )
 
-                val rgbValues = mutableListOf(
-                    addLeadingZeros(Integer.toBinaryString(Color.red(coverPixel)), 8),
-                    addLeadingZeros(Integer.toBinaryString(Color.green(coverPixel)), 8),
-                    addLeadingZeros(Integer.toBinaryString(Color.blue(coverPixel)), 8)
-                )
+                        val grayscale = getGrayscaleValue(
+                            Color.red(secretPixel),
+                            Color.green(secretPixel),
+                            Color.blue(secretPixel)
+                        )
 
-                val grayscale = getGrayscaleValue(
-                    Color.red(secretPixel),
-                    Color.green(secretPixel),
-                    Color.blue(secretPixel)
-                )
+                        val grayscaleBin = addLeadingZeros(Integer.toBinaryString(grayscale), 8)
 
-                val grayscaleBin = addLeadingZeros(Integer.toBinaryString(grayscale), 8)
+                        val resultPixel = Color.argb(
+                            Color.alpha(coverPixel),
 
-                // rrrggbbb
-
-                val resultPixel = Color.argb(
-                    Color.alpha(coverPixel),
-
-                    removeLeadingZeros(
-                        replaceChar(
-                            replaceChar(
+                            removeLeadingZeros(
                                 replaceChar(
-                                    rgbValues[0],
-                                    grayscaleBin[0],
-                                    5
-                                ),
-                                grayscaleBin[1],
-                                6
-                            ),
-                            grayscaleBin[2],
-                            7
-                        )
-                    ).toInt(2),
+                                    replaceChar(
+                                        replaceChar(
+                                            rgbValues[0],
+                                            grayscaleBin[0],
+                                            5
+                                        ),
+                                        grayscaleBin[1],
+                                        6
+                                    ),
+                                    grayscaleBin[2],
+                                    7
+                                )
+                            ).toInt(2),
 
-                    removeLeadingZeros(
-                        replaceChar(
-                            replaceChar(
-                                rgbValues[1],
-                                grayscaleBin[3],
-                                6
-                            ),
-                            grayscaleBin[4],
-                            7
-                        )
-                    ).toInt(2),
-
-                    removeLeadingZeros(
-                        replaceChar(
-                            replaceChar(
+                            removeLeadingZeros(
                                 replaceChar(
-                                    rgbValues[2],
-                                    grayscaleBin[5],
-                                    5
-                                ),
-                                grayscaleBin[6],
-                                6
-                            ),
-                            grayscaleBin[7],
-                            7
-                        )
-                    ).toInt(2)
-                )
+                                    replaceChar(
+                                        rgbValues[1],
+                                        grayscaleBin[3],
+                                        6
+                                    ),
+                                    grayscaleBin[4],
+                                    7
+                                )
+                            ).toInt(2),
 
-                resultImage.setPixel(x, y, resultPixel)
+                            removeLeadingZeros(
+                                replaceChar(
+                                    replaceChar(
+                                        replaceChar(
+                                            rgbValues[2],
+                                            grayscaleBin[5],
+                                            5
+                                        ),
+                                        grayscaleBin[6],
+                                        6
+                                    ),
+                                    grayscaleBin[7],
+                                    7
+                                )
+                            ).toInt(2)
+                        )
+
+                        resultImage.setPixel(x, y, resultPixel)
+                    }
+                }
             }
         }
 
-        return resultImage
+        return@withContext resultImage
     }
 
-    fun decodeSteganography(bitmap: Bitmap): Bitmap {
+    suspend fun decodeSteganography(bitmap: Bitmap): Bitmap = withContext(Dispatchers.Default) {
+        val width = bitmap.width
+        val height = bitmap.height
 
-        val resultImage = Bitmap.createBitmap(bitmap.width, bitmap.height, bitmap.config)
+        val resultImage = Bitmap.createBitmap(width, height, bitmap.config)
 
-        for (x in 0 until bitmap.width) {
-            for (y in 0 until bitmap.height) {
+        coroutineScope {
+            for (x in 0 until width) {
+                for (y in 0 until height) {
+                    launch {
+                        val steganographyPixel = bitmap.getPixel(x, y)
 
-                val steganographyPixel = bitmap.getPixel(x, y)
+                        val red = addLeadingZeros(Integer.toBinaryString(Color.red(steganographyPixel)), 8)
+                        val green = addLeadingZeros(Integer.toBinaryString(Color.green(steganographyPixel)), 8)
+                        val blue = addLeadingZeros(Integer.toBinaryString(Color.blue(steganographyPixel)), 8)
 
-                val red = addLeadingZeros(Integer.toBinaryString(Color.red(steganographyPixel)), 8)
-                val green =
-                    addLeadingZeros(Integer.toBinaryString(Color.green(steganographyPixel)), 8)
-                val blue =
-                    addLeadingZeros(Integer.toBinaryString(Color.blue(steganographyPixel)), 8)
+                        var grayscale = "00000000"
 
-                var grayscale = "00000000"
+                        grayscale = replaceChar(grayscale, red[5], 0)
+                        grayscale = replaceChar(grayscale, red[6], 1)
+                        grayscale = replaceChar(grayscale, red[7], 2)
+                        grayscale = replaceChar(grayscale, green[6], 3)
+                        grayscale = replaceChar(grayscale, green[7], 4)
+                        grayscale = replaceChar(grayscale, blue[5], 5)
+                        grayscale = replaceChar(grayscale, blue[6], 6)
+                        grayscale = replaceChar(grayscale, blue[7], 7)
 
-                grayscale = replaceChar(grayscale, red[5], 0)
-                grayscale = replaceChar(grayscale, red[6], 1)
-                grayscale = replaceChar(grayscale, red[7], 2)
-                grayscale = replaceChar(grayscale, green[6], 3)
-                grayscale = replaceChar(grayscale, green[7], 4)
-                grayscale = replaceChar(grayscale, blue[5], 5)
-                grayscale = replaceChar(grayscale, blue[6], 6)
-                grayscale = replaceChar(grayscale, blue[7], 7)
-
-                resultImage.setPixel(
-                    x, y, Color.argb(
-                        Color.alpha(steganographyPixel),
-                        grayscale.toInt(2),
-                        grayscale.toInt(2),
-                        grayscale.toInt(2)
-                    )
-                )
+                        resultImage.setPixel(
+                            x, y, Color.argb(
+                                Color.alpha(steganographyPixel),
+                                grayscale.toInt(2),
+                                grayscale.toInt(2),
+                                grayscale.toInt(2)
+                            )
+                        )
+                    }
+                }
             }
         }
 
-        return resultImage
+        return@withContext resultImage
     }
 
-    fun applySteganographyText(bitmap: Bitmap, text: String): Bitmap {
-
+    suspend fun applySteganographyText(bitmap: Bitmap, text: String): Bitmap = withContext(Dispatchers.Default) {
         val resultImage = Bitmap.createBitmap(bitmap.width, bitmap.height, bitmap.config)
 
         var currTextIndex = -1
 
-        for (x in 0 until bitmap.width) {
-            for (y in 0 until bitmap.height) {
+        coroutineScope {
+            for (x in 0 until bitmap.width) {
+                for (y in 0 until bitmap.height) {
+                    launch {
+                        currTextIndex++
 
-                currTextIndex++
+                        if (currTextIndex > text.length) {
+                            resultImage.setPixel(x, y, bitmap.getPixel(x, y))
+                            return@launch
+                        }
 
-                if (currTextIndex > text.length) {
-                    resultImage.setPixel(x, y, bitmap.getPixel(x, y))
-                    continue
-                }
+                        val currChar: String = if (currTextIndex == text.length) {
+                            "00000000"
+                        } else {
+                            addLeadingZeros(Integer.toBinaryString(text[currTextIndex].toInt()), 8)
+                        }
 
-                val currChar: String = if (currTextIndex == text.length) {
-                    "00000000"
-                } else {
-                    addLeadingZeros(Integer.toBinaryString(text[currTextIndex].toInt()), 8)
-                }
+                        val coverPixel = bitmap.getPixel(x, y)
 
-                val coverPixel = bitmap.getPixel(x, y)
+                        val red = addLeadingZeros(Integer.toBinaryString(Color.red(coverPixel)), 8)
+                        val green = addLeadingZeros(Integer.toBinaryString(Color.green(coverPixel)), 8)
+                        val blue = addLeadingZeros(Integer.toBinaryString(Color.blue(coverPixel)), 8)
 
-                val red = addLeadingZeros(Integer.toBinaryString(Color.red(coverPixel)), 8)
-                val green = addLeadingZeros(Integer.toBinaryString(Color.green(coverPixel)), 8)
-                val blue = addLeadingZeros(Integer.toBinaryString(Color.blue(coverPixel)), 8)
+                        val resultPixel = Color.argb(
+                            Color.alpha(coverPixel),
 
-                val resultPixel = Color.argb(
-                    Color.alpha(coverPixel),
-
-                    removeLeadingZeros(
-                        replaceChar(
-                            replaceChar(
+                            removeLeadingZeros(
                                 replaceChar(
-                                    red,
-                                    currChar[0],
-                                    5
-                                ),
-                                currChar[1],
-                                6
-                            ),
-                            currChar[2],
-                            7
-                        )
-                    ).toInt(2),
+                                    replaceChar(
+                                        replaceChar(
+                                            red,
+                                            currChar[0],
+                                            5
+                                        ),
+                                        currChar[1],
+                                        6
+                                    ),
+                                    currChar[2],
+                                    7
+                                )
+                            ).toInt(2),
 
-                    removeLeadingZeros(
-                        replaceChar(
-                            replaceChar(
-                                green,
-                                currChar[3],
-                                6
-                            ),
-                            currChar[4],
-                            7
-                        )
-                    ).toInt(2),
-
-                    removeLeadingZeros(
-                        replaceChar(
-                            replaceChar(
+                            removeLeadingZeros(
                                 replaceChar(
-                                    blue,
-                                    currChar[5],
-                                    5
-                                ),
-                                currChar[6],
-                                6
-                            ),
-                            currChar[7],
-                            7
+                                    replaceChar(
+                                        green,
+                                        currChar[3],
+                                        6
+                                    ),
+                                    currChar[4],
+                                    7
+                                )
+                            ).toInt(2),
+
+                            removeLeadingZeros(
+                                replaceChar(
+                                    replaceChar(
+                                        replaceChar(
+                                            blue,
+                                            currChar[5],
+                                            5
+                                        ),
+                                        currChar[6],
+                                        6
+                                    ),
+                                    currChar[7],
+                                    7
+                                )
+                            ).toInt(2)
                         )
-                    ).toInt(2)
-                )
 
-                resultImage.setPixel(x, y, resultPixel)
-
+                        resultImage.setPixel(x, y, resultPixel)
+                    }
+                }
             }
         }
 
-        return resultImage
+        return@withContext resultImage
     }
 
-    fun decodeSteganographyText(bitmap: Bitmap): String {
-
+    suspend fun decodeSteganographyText(bitmap: Bitmap): String = withContext(Dispatchers.Default) {
         val resultImage = Bitmap.createBitmap(bitmap.width, bitmap.height, bitmap.config)
 
         var decodedText = ""
 
-        for (x in 0 until bitmap.width) {
-            for (y in 0 until bitmap.height) {
+        coroutineScope {
+            for (x in 0 until bitmap.width) {
+                for (y in 0 until bitmap.height) {
+                    launch {
+                        val coverPixel = bitmap.getPixel(x, y)
 
-                val coverPixel = bitmap.getPixel(x, y)
+                        val red = addLeadingZeros(Integer.toBinaryString(Color.red(coverPixel)), 8)
+                        val green = addLeadingZeros(Integer.toBinaryString(Color.green(coverPixel)), 8)
+                        val blue = addLeadingZeros(Integer.toBinaryString(Color.blue(coverPixel)), 8)
 
-                val red = addLeadingZeros(Integer.toBinaryString(Color.red(coverPixel)), 8)
-                val green = addLeadingZeros(Integer.toBinaryString(Color.green(coverPixel)), 8)
-                val blue = addLeadingZeros(Integer.toBinaryString(Color.blue(coverPixel)), 8)
+                        var encodedChar = "00000000"
 
-                var encodedChar = "00000000"
+                        encodedChar = replaceChar(encodedChar, red[5], 0)
+                        encodedChar = replaceChar(encodedChar, red[6], 1)
+                        encodedChar = replaceChar(encodedChar, red[7], 2)
+                        encodedChar = replaceChar(encodedChar, green[6], 3)
+                        encodedChar = replaceChar(encodedChar, green[7], 4)
+                        encodedChar = replaceChar(encodedChar, blue[5], 5)
+                        encodedChar = replaceChar(encodedChar, blue[6], 6)
+                        encodedChar = replaceChar(encodedChar, blue[7], 7)
 
-                encodedChar = replaceChar(encodedChar, red[5], 0)
-                encodedChar = replaceChar(encodedChar, red[6], 1)
-                encodedChar = replaceChar(encodedChar, red[7], 2)
-                encodedChar = replaceChar(encodedChar, green[6], 3)
-                encodedChar = replaceChar(encodedChar, green[7], 4)
-                encodedChar = replaceChar(encodedChar, blue[5], 5)
-                encodedChar = replaceChar(encodedChar, blue[6], 6)
-                encodedChar = replaceChar(encodedChar, blue[7], 7)
+                        if (encodedChar == "00000000") {
+                            return@launch
+                        }
 
-                if (encodedChar == "00000000") {
-                    return decodedText
+                        decodedText += Integer.parseInt(removeLeadingZeros(encodedChar), 2).toChar()
+                    }
                 }
-
-                decodedText += Integer.parseInt(removeLeadingZeros(encodedChar), 2).toChar()
             }
         }
 
-        return decodedText
+        return@withContext decodedText
     }
 
     private fun replaceChar(str: String, ch: Char, index: Int): String {
@@ -1065,35 +1092,37 @@ class Filters {
         return "0"
     }
 
-    fun applyUnsharpMask(bitmap: Bitmap, strength: Double, radius: Int): Bitmap {
-
+    suspend fun applyUnsharpMask(bitmap: Bitmap, strength: Double, radius: Int): Bitmap = withContext(Dispatchers.Default) {
         val blurredBitmap = applyGaussBlur(bitmap, radius)
         val resultImage = Bitmap.createBitmap(bitmap.width, bitmap.height, bitmap.config)
 
-        for (x in 0 until bitmap.width) {
-            for (y in 0 until bitmap.height) {
+        coroutineScope {
+            for (x in 0 until bitmap.width) {
+                for (y in 0 until bitmap.height) {
+                    launch {
+                        val pixel = bitmap.getPixel(x, y)
+                        val red = Color.red(pixel)
+                        val green = Color.green(pixel)
+                        val blue = Color.blue(pixel)
 
-                val pixel = bitmap.getPixel(x, y)
-                val red = Color.red(pixel)
-                val green = Color.green(pixel)
-                val blue = Color.blue(pixel)
+                        val blurredPixel = blurredBitmap.getPixel(x, y)
+                        val blurredRed = Color.red(blurredPixel)
+                        val blurredGreen = Color.green(blurredPixel)
+                        val blurredBlue = Color.blue(blurredPixel)
 
-                val blurredPixel = blurredBitmap.getPixel(x, y)
-                val blurredRed = Color.red(blurredPixel)
-                val blurredGreen = Color.green(blurredPixel)
-                val blurredBlue = Color.blue(blurredPixel)
+                        val newPixel = Color.argb(
+                            255,
+                            Math.max(Math.min((red + (red - blurredRed) * strength).toInt(), 255), 0),
+                            Math.max(Math.min((green + (green - blurredGreen) * strength).toInt(), 255), 0),
+                            Math.max(Math.min((blue + (blue - blurredBlue) * strength).toInt(), 255), 0)
+                        )
 
-                val newPixel = Color.argb(
-                    255,
-                    Math.max(Math.min((red + (red - blurredRed) * strength).toInt(), 255), 0),
-                    Math.max(Math.min((green + (green - blurredGreen) * strength).toInt(), 255), 0),
-                    Math.max(Math.min((blue + (blue - blurredBlue) * strength).toInt(), 255), 0)
-                )
-
-                resultImage.setPixel(x, y, newPixel)
+                        resultImage.setPixel(x, y, newPixel)
+                    }
+                }
             }
         }
 
-        return resultImage
+        return@withContext resultImage
     }
 }

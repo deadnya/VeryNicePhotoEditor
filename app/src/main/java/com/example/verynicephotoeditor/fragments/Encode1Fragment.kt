@@ -18,10 +18,12 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.example.verynicephotoeditor.R
 import com.example.verynicephotoeditor.SharedViewModel
 import com.example.verynicephotoeditor.activities.MainActivity
 import com.example.verynicephotoeditor.algorithms.task2.Filters
+import kotlinx.coroutines.launch
 
 class Encode1Fragment : Fragment() {
 
@@ -67,10 +69,11 @@ class Encode1Fragment : Fragment() {
 
             val bitmap = sharedViewModel.bitmap.value
             if (bitmap != null) {
-                val filteredBitmap = Filters().createSteganography50x50(bitmap, uploadedBitmap)
-                sharedViewModel.setBitmap(filteredBitmap)
+                lifecycleScope.launch {
+                    val filteredBitmap = Filters().createSteganography50x50(bitmap, uploadedBitmap)
+                    sharedViewModel.setBitmap(filteredBitmap)
+                }
             }
-
         }
 
         view.findViewById<ImageButton>(R.id.backPanel).setOnClickListener {

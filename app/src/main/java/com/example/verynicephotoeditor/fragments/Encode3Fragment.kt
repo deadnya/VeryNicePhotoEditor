@@ -10,10 +10,12 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageButton
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.example.verynicephotoeditor.R
 import com.example.verynicephotoeditor.SharedViewModel
 import com.example.verynicephotoeditor.activities.MainActivity
 import com.example.verynicephotoeditor.algorithms.task2.Filters
+import kotlinx.coroutines.launch
 
 class Encode3Fragment : Fragment() {
 
@@ -30,9 +32,10 @@ class Encode3Fragment : Fragment() {
 
             val bitmap = sharedViewModel.bitmap.value
             if (bitmap != null) {
-                val filteredBitmap =
-                    Filters().applySteganographyText(bitmap, editText.text.toString())
-                sharedViewModel.setBitmap(filteredBitmap)
+                lifecycleScope.launch {
+                    val filteredBitmap = Filters().applySteganographyText(bitmap, editText.text.toString())
+                    sharedViewModel.setBitmap(filteredBitmap)
+                }
             }
 
         }

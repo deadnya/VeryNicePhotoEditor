@@ -10,10 +10,14 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.example.verynicephotoeditor.R
 import com.example.verynicephotoeditor.SharedViewModel
 import com.example.verynicephotoeditor.activities.MainActivity
 import com.example.verynicephotoeditor.algorithms.task2.Filters
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class Decode3Fragment : Fragment() {
 
@@ -29,11 +33,16 @@ class Decode3Fragment : Fragment() {
 
             val bitmap = sharedViewModel.bitmap.value
             if (bitmap != null) {
-                Toast.makeText(
-                    requireContext(),
-                    Filters().decodeSteganographyText(bitmap),
-                    Toast.LENGTH_SHORT
-                ).show()
+                lifecycleScope.launch {
+                    val decodedText = Filters().decodeSteganographyText(bitmap)
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(
+                            requireContext(),
+                            decodedText,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
             }
 
         }
