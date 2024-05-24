@@ -24,12 +24,14 @@ class OilFragment : Fragment() {
 
     private lateinit var sharedViewModel: SharedViewModel
 
-    private val takePictureLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val imageBitmap = result.data?.extras?.get("data") as Bitmap
-            sharedViewModel.setBitmap(imageBitmap)
+    private val takePictureLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val imageBitmap = result.data?.extras?.get("data") as Bitmap
+                sharedViewModel.setBitmap(imageBitmap)
+            }
         }
-    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -64,7 +66,6 @@ class OilFragment : Fragment() {
                 sharedViewModel.setBitmap(filteredBitmap)
             }
 
-            Log.d("AAAA", "AAAAAAAAAAA")
         }
 
         view.findViewById<ImageButton>(R.id.backPanel).setOnClickListener {

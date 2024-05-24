@@ -22,12 +22,14 @@ class DitherFragment : Fragment() {
 
     private lateinit var sharedViewModel: SharedViewModel
 
-    private val takePictureLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val imageBitmap = result.data?.extras?.get("data") as Bitmap
-            sharedViewModel.setBitmap(imageBitmap)
+    private val takePictureLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val imageBitmap = result.data?.extras?.get("data") as Bitmap
+                sharedViewModel.setBitmap(imageBitmap)
+            }
         }
-    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val imageButton8 = view.findViewById<ImageButton>(R.id.imageButton8)
@@ -41,7 +43,7 @@ class DitherFragment : Fragment() {
         val imageButton9 = view.findViewById<ImageButton>(R.id.imageButton9)
         imageButton9.setOnClickListener {
 
-            sharedViewModel = ViewModelProvider(requireActivity()).get(SharedViewModel::class.java)
+            sharedViewModel = ViewModelProvider(requireActivity())[SharedViewModel::class.java]
 
             val bitmap = sharedViewModel.bitmap.value
             if (bitmap != null) {
@@ -49,7 +51,6 @@ class DitherFragment : Fragment() {
                 sharedViewModel.setBitmap(filteredBitmap)
             }
 
-            Log.d("AAAA", "AAAA")
         }
 
         view.findViewById<ImageButton>(R.id.backPanel).setOnClickListener {

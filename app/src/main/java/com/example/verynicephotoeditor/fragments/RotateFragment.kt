@@ -42,12 +42,15 @@ class RotateFragment : Fragment() {
             isOtherAlgorithmUsed = true
         }
     }
-    private val takePictureLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val imageBitmap = result.data?.extras?.get("data") as Bitmap
-            sharedViewModel.setBitmap(imageBitmap)
+
+    private val takePictureLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val imageBitmap = result.data?.extras?.get("data") as Bitmap
+                sharedViewModel.setBitmap(imageBitmap)
+            }
         }
-    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -89,10 +92,9 @@ class RotateFragment : Fragment() {
             lifecycleScope.launch(Dispatchers.Default) {
 
                 val rotatedBitmap =
-                    RotationAlgorithm().rotateBitmap(bitmap, rotationDegrees, isOtherAlgorithmUsed)
+                    RotationAlgorithm().rotateBitmap(bitmap, rotationDegrees)
                 isOtherAlgorithmUsed = false
 
-                // Update the bitmap in the sharedViewModel on the Main dispatcher
                 withContext(Dispatchers.Main) {
                     sharedViewModel.setBitmap(rotatedBitmap)
                 }
@@ -107,7 +109,7 @@ class RotateFragment : Fragment() {
         }
     }
 
-    fun recyclerBitmap(bitmap: Bitmap) {
+    private fun recyclerBitmap(bitmap: Bitmap) {
         bitmap.recycle()
     }
 

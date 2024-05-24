@@ -3,9 +3,9 @@ package com.example.verynicephotoeditor.algorithms.task9
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.Matrix
 import android.graphics.Point
 import kotlin.math.PI
+import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.cos
 import kotlin.math.floor
@@ -81,37 +81,37 @@ class SpinningCube {
 
         zDots.sort()
 
-        if (image1 != null && (z1 == z[0] || z1 == z[1] || z1 == z[2])) {
+        if (z1 == z[0] || z1 == z[1] || z1 == z[2]) {
             val minX = min(min(cube.dot1.x, cube.dot2.x), min(cube.dot3.x, cube.dot4.x))
             val minY = min(min(cube.dot1.y, cube.dot2.y), min(cube.dot3.y, cube.dot4.y))
             canvas.drawBitmap(image1, size.x / 2 + minX.toFloat() * 100, size.y / 2 + minY.toFloat() * 100, null)
         }
 
-        if (image2 != null && (z2 == z[0] || z2 == z[1] || z2 == z[2])) {
+        if (z2 == z[0] || z2 == z[1] || z2 == z[2]) {
             val minX = min(min(cube.dot1.x, cube.dot2.x), min(cube.dot6.x, cube.dot5.x))
             val minY = min(min(cube.dot1.y, cube.dot2.y), min(cube.dot6.y, cube.dot5.y))
             canvas.drawBitmap(image2, size.x / 2 + minX.toFloat() * 100, size.y / 2 + minY.toFloat() * 100, null)
         }
 
-        if (image3 != null && (z3 == z[0] || z3 == z[1] || z3 == z[2])) {
+        if (z3 == z[0] || z3 == z[1] || z3 == z[2]) {
             val minX = min(min(cube.dot2.x, cube.dot3.x), min(cube.dot7.x, cube.dot6.x))
             val minY = min(min(cube.dot2.y, cube.dot3.y), min(cube.dot7.y, cube.dot6.y))
             canvas.drawBitmap(image3, size.x / 2 + minX.toFloat() * 100, size.y / 2 + minY.toFloat() * 100, null)
         }
 
-        if (image4 != null && (z4 == z[0] || z4 == z[1] || z4 == z[2])) {
+        if (z4 == z[0] || z4 == z[1] || z4 == z[2]) {
             val minX = min(min(cube.dot3.x, cube.dot4.x), min(cube.dot8.x, cube.dot7.x))
             val minY = min(min(cube.dot3.y, cube.dot4.y), min(cube.dot8.y, cube.dot7.y))
             canvas.drawBitmap(image4, size.x / 2 + minX.toFloat() * 100, size.y / 2 + minY.toFloat() * 100, null)
         }
 
-        if (image5 != null && (z5 == z[0] || z5 == z[1] || z5 == z[2])) {
+        if (z5 == z[0] || z5 == z[1] || z5 == z[2]) {
             val minX = min(min(cube.dot4.x, cube.dot1.x), min(cube.dot5.x, cube.dot8.x))
             val minY = min(min(cube.dot4.y, cube.dot1.y), min(cube.dot5.y, cube.dot8.y))
             canvas.drawBitmap(image5, size.x / 2 + minX.toFloat() * 100, size.y / 2 + minY.toFloat() * 100, null)
         }
 
-        if (image6 != null && (z6 == z[0] || z6 == z[1] || z6 == z[2])) {
+        if (z6 == z[0] || z6 == z[1] || z6 == z[2]) {
             val minX = min(min(cube.dot5.x, cube.dot6.x), min(cube.dot7.x, cube.dot8.x))
             val minY = min(min(cube.dot5.y, cube.dot6.y), min(cube.dot7.y, cube.dot8.y))
             canvas.drawBitmap(image6, size.x / 2 + minX.toFloat() * 100, size.y / 2 + minY.toFloat() * 100, null)
@@ -165,7 +165,7 @@ class SpinningCube {
             drawLine(mutableBitmap, translatedCube.dot8, translatedCube.dot5, stroke, size)
     }
 
-    fun affinTransmutation(bitmap: Bitmap, dotsList: List<Dot>): Bitmap {
+    private fun affinTransmutation(bitmap: Bitmap, dotsList: List<Dot>): Bitmap {
 
         val src = dotsList.subList(0, 3)
         val dst = dotsList.subList(3, 6)
@@ -200,17 +200,6 @@ class SpinningCube {
                 val oldY = (inverseMatrix[3] * x + inverseMatrix[4] * y + inverseMatrix[5]).toFloat()
 
                 if (oldX.toInt() in 0 until bitmap.width && oldY.toInt() in 0 until bitmap.height) {
-                    //val pixelX = if (scaleUpX) {
-                    //bilinearInterpolation(oldX, oldY, bitmap)
-                    //} else {
-                    //trilinearInterpolation(oldX, oldY, 1f, bitmap)
-                    //}
-
-                    //val pixelY = if (scaleUpY) {
-                    //bilinearInterpolation(oldX, oldY, bitmap)
-                    //} else {
-                    //trilinearInterpolation(oldX, oldY, 1f, bitmap)
-                    //}
 
                     val pixel = bilinearInterpolation(oldX, oldY, bitmap)
 
@@ -310,18 +299,16 @@ class SpinningCube {
             (percentX * Color.blue(q12) + revPercentX * Color.blue(q22)).toInt()
         )
 
-        val ans = Color.argb(
+        return Color.argb(
             (percentY * Color.alpha(r1) + revPercentY * Color.alpha(r2)).toInt(),
             (percentY * Color.red(r1) + revPercentY * Color.red(r2)).toInt(),
             (percentY * Color.green(r1) + revPercentY * Color.green(r2)).toInt(),
             (percentY * Color.blue(r1) + revPercentY * Color.blue(r2)).toInt()
         )
-
-        return ans
     }
 
 
-    fun drawDot(mutableBitmap: Bitmap, dotSize: Int, dot: Dot, size: Point) {
+    private fun drawDot(mutableBitmap: Bitmap, dotSize: Int, dot: Dot, size: Point) {
 
         val x = (size.x / 2 + dot.x * 100).toInt()
         val y = (size.y / 2 + dot.y * 100).toInt()
@@ -329,8 +316,8 @@ class SpinningCube {
         for (xx in x - dotSize + 1..<x + dotSize) {
             for (yy in y - dotSize + 1..<y + dotSize) {
 
-                val currX = Math.max(Math.min(xx, mutableBitmap.width - 1), 0)
-                val currY = Math.max(Math.min(yy, mutableBitmap.height - 1), 0)
+                val currX = xx.coerceAtMost(mutableBitmap.width - 1).coerceAtLeast(0)
+                val currY = yy.coerceAtMost(mutableBitmap.height - 1).coerceAtLeast(0)
 
                 if (dist(
                         xx.toDouble(),
@@ -350,15 +337,15 @@ class SpinningCube {
         }
     }
 
-    fun drawLine(mutableBitmap: Bitmap, dot1: Dot, dot2: Dot, strokeSize: Int, size: Point) {
+    private fun drawLine(mutableBitmap: Bitmap, dot1: Dot, dot2: Dot, strokeSize: Int, size: Point) {
 
         val x1 = (size.x / 2 + dot1.x * 100).toInt()
         val y1 = (size.y / 2 + dot1.y * 100).toInt()
         val x2 = (size.x / 2 + dot2.x * 100).toInt()
         val y2 = (size.y / 2 + dot2.y * 100).toInt()
 
-        val dx = Math.abs(x2 - x1)
-        val dy = Math.abs(y2 - y1)
+        val dx = abs(x2 - x1)
+        val dy = abs(y2 - y1)
 
         val sx = if (x1 < x2) 1 else -1
         val sy = if (y1 < y2) 1 else -1
@@ -408,13 +395,10 @@ class Cube(
     var dot8 : Dot
 ) {
 
-    // 2000px swipe = full rotation
     private val distToAngle = 2 * PI / 2000.0
 
-    // to prevent cube from scaling on
-    private val maxDist = 1.73205080757
 
-    var m = mutableListOf(
+    private var m = mutableListOf(
         mutableListOf(0.0, 0.0, 0.0, 0.0),
         mutableListOf(0.0, 0.0, 0.0, 0.0),
         mutableListOf(0.0, 0.0, 0.0, 0.0),
@@ -490,7 +474,7 @@ class Cube(
         dot8 = matrixMultiplication(dot8, matrix)
     }
 
-    fun matrixMultiplication(dot: Dot, matrix: MutableList<MutableList<Double>>) : Dot {
+    private fun matrixMultiplication(dot: Dot, matrix: MutableList<MutableList<Double>>) : Dot {
 
         val result = Dot(
             dot.x * matrix[0][0] + dot.y * matrix[1][0] + dot.z * matrix[2][0] + matrix[3][0],

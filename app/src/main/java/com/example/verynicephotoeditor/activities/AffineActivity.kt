@@ -12,7 +12,7 @@ import com.example.verynicephotoeditor.algorithms.task8.Affines
 import com.example.verynicephotoeditor.algorithms.task8.Dot
 import com.example.verynicephotoeditor.databinding.ActivityAffinesBinding
 
-class AffineActivity : AppCompatActivity()  {
+class AffineActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAffinesBinding
 

@@ -13,11 +13,14 @@ class RotationAlgorithm {
     private var newWidth = 0
     private var newHeight = 0
 
-    suspend fun rotateBitmap(source: Bitmap, degrees: Double, isOtherAlgorithmUsed: Boolean): Bitmap = coroutineScope {
+    suspend fun rotateBitmap(
+        source: Bitmap,
+        degrees: Double,
+    ): Bitmap = coroutineScope {
 
 
         totalRotationDegrees += degrees
-        totalRotationDegrees%=360
+        totalRotationDegrees %= 360
 
         val angleInRadians = Math.toRadians(totalRotationDegrees)
         val cos = cos(angleInRadians)

@@ -1,5 +1,6 @@
 package com.example.verynicephotoeditor.fragments
 
+import android.Manifest.permission.CAMERA
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.Manifest.permission.READ_MEDIA_IMAGES
 import android.Manifest.permission.READ_MEDIA_VIDEO
@@ -17,9 +18,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import com.example.verynicephotoeditor.PermissionsViewModel
 import com.example.verynicephotoeditor.R
 import com.example.verynicephotoeditor.activities.AffineActivity
 import com.example.verynicephotoeditor.activities.ImageStorageActivity
@@ -33,7 +37,8 @@ class MainMenuFragment : Fragment() {
 
     private lateinit var binding: FragmentMainMenuBinding
 
-    private lateinit var startingBitmap : Bitmap
+    private lateinit var startingBitmap: Bitmap
+    private lateinit var permissionsViewModel: PermissionsViewModel
 
     @RequiresApi(Build.VERSION_CODES.P)
     private val pickImage =
@@ -72,7 +77,8 @@ class MainMenuFragment : Fragment() {
             if (result.resultCode == Activity.RESULT_OK) {
                 val imageUri = result.data?.data
                 if (imageUri != null) {
-                    val source = ImageDecoder.createSource(requireContext().contentResolver, imageUri)
+                    val source =
+                        ImageDecoder.createSource(requireContext().contentResolver, imageUri)
                     var bitmap = ImageDecoder.decodeBitmap(source)
 
                     // Check if the bitmap is hardware accelerated
@@ -94,14 +100,17 @@ class MainMenuFragment : Fragment() {
                     intent.putExtra("imagePath", file.absolutePath)
                     startActivity(intent)
 
-                    Log.d("AAA", "AAA")
+
                 } else {
-                    // Handle the case where the imageUri is null
-                    Log.d("AAA", "Image URI is null")
+                    Toast.makeText(requireContext(), "Failed to pick image", Toast.LENGTH_SHORT)
+                        .show()
                 }
             } else {
-                // Handle the case where the result is not OK
-                Log.d("AAA", "Image picking operation was not successful")
+                Toast.makeText(
+                    requireContext(),
+                    "Image picking operation was not successful",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
 
@@ -111,7 +120,8 @@ class MainMenuFragment : Fragment() {
             if (result.resultCode == Activity.RESULT_OK) {
                 val imageUri = result.data?.data
                 if (imageUri != null) {
-                    val source = ImageDecoder.createSource(requireContext().contentResolver, imageUri)
+                    val source =
+                        ImageDecoder.createSource(requireContext().contentResolver, imageUri)
                     var bitmap = ImageDecoder.decodeBitmap(source)
 
                     // Check if the bitmap is hardware accelerated
@@ -133,14 +143,16 @@ class MainMenuFragment : Fragment() {
                     intent.putExtra("imagePath", file.absolutePath)
                     startActivity(intent)
 
-                    Log.d("AAA", "AAA")
                 } else {
-                    // Handle the case where the imageUri is null
-                    Log.d("AAA", "Image URI is null")
+                    Toast.makeText(requireContext(), "Failed to pick image", Toast.LENGTH_SHORT)
+                        .show()
                 }
             } else {
-                // Handle the case where the result is not OK
-                Log.d("AAA", "Image picking operation was not successful")
+                Toast.makeText(
+                    requireContext(),
+                    "Image picking operation was not successful",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
 
@@ -165,7 +177,8 @@ class MainMenuFragment : Fragment() {
                     READ_MEDIA_IMAGES,
                     READ_MEDIA_VIDEO,
                     READ_MEDIA_VISUAL_USER_SELECTED,
-                    WRITE_EXTERNAL_STORAGE
+                    WRITE_EXTERNAL_STORAGE,
+                    CAMERA
                 )
             )
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -173,6 +186,15 @@ class MainMenuFragment : Fragment() {
         } else {
             requestPermissions.launch(arrayOf(READ_EXTERNAL_STORAGE))
         }
+        permissionsViewModel =
+            ViewModelProvider(requireActivity())[PermissionsViewModel::class.java]
+
+        permissionsViewModel.permissionsGranted.observe(viewLifecycleOwner) { granted ->
+            binding.goToAffines.isEnabled = granted
+            binding.goToFilters.isEnabled = granted
+            binding.goToRetush.isEnabled = granted
+        }
+
 
         binding.goToFilters.setOnClickListener {
             val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)

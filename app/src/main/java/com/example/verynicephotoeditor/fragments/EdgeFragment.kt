@@ -63,8 +63,6 @@ class EdgeFragment : Fragment() {
                 val filteredBitmap = Filters().applyEdgerator(bitmap, seekBar.progress)
                 sharedViewModel.setBitmap(filteredBitmap)
             }
-
-            Log.d("AAAA", "AAAAAAAAAAA")
         }
 
         view.findViewById<ImageButton>(R.id.backPanel).setOnClickListener {
