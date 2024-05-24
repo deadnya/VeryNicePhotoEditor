@@ -56,7 +56,7 @@ class AffineActivity : AppCompatActivity() {
                         bitmap = newBitmap
                         mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
                         binding.imageView.setImageBitmap(newBitmap)
-                        dotsList = mutableListOf<Dot>()
+                        dotsList = mutableListOf()
                     }
                 }
             }

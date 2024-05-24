@@ -10,6 +10,7 @@
         android:id="@+id/imageView"
         android:layout_width="350dp"
         android:layout_height="350dp"
+        android:contentDescription="@string/image"
         android:scaleType="fitCenter"
         app:layout_constraintBottom_toTopOf="@+id/menuLayout"
         app:layout_constraintEnd_toEndOf="parent"
@@ -21,8 +22,8 @@
         android:id="@+id/menuLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
         android:background="#292E32"
+        android:padding="16dp"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <TextView
@@ -30,8 +31,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:textColor="#FFFFFF"
-            android:text="Radius: 3" />
+            android:text="@string/radius_3"
+            android:textColor="#FFFFFF" />
 
         <SeekBar
             android:id="@+id/radiusSlider"
@@ -40,19 +41,19 @@
             android:layout_below="@+id/radiusValue"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="16dp"
-            android:thumbTint="#007AFF"
-            android:progressTint="#007AFF"
             android:max="47"
-            android:progress="0" />
+            android:progress="0"
+            android:progressTint="#007AFF"
+            android:thumbTint="#007AFF" />
 
         <TextView
             android:id="@+id/strengthValue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/radiusSlider"
-            android:textColor="#FFFFFF"
             android:layout_centerHorizontal="true"
-            android:text="Strength: 0.10" />
+            android:text="@string/strength_0_10"
+            android:textColor="#FFFFFF" />
 
         <SeekBar
             android:id="@+id/strengthSlider"
@@ -61,30 +62,32 @@
             android:layout_below="@+id/strengthValue"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="16dp"
-            android:thumbTint="#007AFF"
-            android:progressTint="#007AFF"
             android:max="90"
-            android:progress="0" />
+            android:progress="0"
+            android:progressTint="#007AFF"
+            android:thumbTint="#007AFF" />
 
         <ImageButton
             android:id="@+id/saveButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/save_button"
-            android:background="?android:attr/selectableItemBackground"
             android:layout_below="@+id/strengthSlider"
             android:layout_alignParentStart="true"
-            android:layout_marginTop="16dp" />
+            android:layout_marginTop="16dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:contentDescription="@string/save_button"
+            android:src="@drawable/save_button" />
 
         <ImageButton
             android:id="@+id/backButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/back_button"
-            android:background="?android:attr/selectableItemBackground"
             android:layout_below="@+id/strengthSlider"
             android:layout_alignParentEnd="true"
-            android:layout_marginTop="16dp" />
+            android:layout_marginTop="16dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:contentDescription="@string/go_back"
+            android:src="@drawable/back_button" />
 
     </RelativeLayout>
 

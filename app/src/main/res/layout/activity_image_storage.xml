@@ -31,7 +31,8 @@
         app:layout_constraintBottom_toTopOf="@+id/frame"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView3" />
+        app:layout_constraintTop_toBottomOf="@+id/imageView3"
+        android:contentDescription="@string/image" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
@@ -52,7 +53,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0"
-        app:srcCompat="@drawable/rectangle_2" />
+        app:srcCompat="@drawable/rectangle_2"
+        android:contentDescription="@string/top_bar" />
 
     <ImageButton
         android:id="@+id/galleryButton"
@@ -66,7 +68,8 @@
         app:layout_constraintHorizontal_bias="0.11"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.48000002" />
+        app:layout_constraintVertical_bias="0.48000002"
+        android:contentDescription="@string/load_picture" />
 
     <ImageButton
         android:id="@+id/imageButton7"
@@ -80,7 +83,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/imageView3"
         app:layout_constraintVertical_bias="0.484"
-        app:srcCompat="@drawable/save" />
+        app:srcCompat="@drawable/save"
+        android:contentDescription="@string/save_button" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

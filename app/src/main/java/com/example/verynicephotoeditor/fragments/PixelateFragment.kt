@@ -62,10 +62,9 @@ class PixelateFragment : Fragment() {
 
             val bitmap = sharedViewModel.bitmap.value
             if (bitmap != null) {
-
-                    val filteredBitmap = Filters().pixelateBitmap(bitmap, seekBar.progress)
-                        sharedViewModel.setBitmap(filteredBitmap)
-                }
+                val filteredBitmap = Filters().pixelateBitmap(bitmap, seekBar.progress)
+                sharedViewModel.setBitmap(filteredBitmap)
+            }
         }
 
         view.findViewById<ImageButton>(R.id.backPanel).setOnClickListener {

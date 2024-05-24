@@ -1,19 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".fragments.RotateFragment">
-
-
-    <!-- TODO: Update blank fragment layout -->
 
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="405dp"
         android:layout_height="292dp"
         android:layout_marginBottom="4dp"
+        android:contentDescription="TODO"
         android:scaleX="10"
         android:scaleY="1"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -32,7 +30,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/imageView"
         app:layout_constraintVertical_bias="0.778"
-        app:srcCompat="@drawable/camera" />
+        app:srcCompat="@drawable/camera"
+        android:contentDescription="@string/take_a_photo" />
 
     <ImageButton
         android:id="@+id/backPanel"
@@ -45,7 +44,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/imageView"
         app:layout_constraintVertical_bias="0.778"
-        app:srcCompat="@drawable/back" />
+        app:srcCompat="@drawable/back"
+        android:contentDescription="@string/go_back" />
 
     <ImageButton
         android:id="@+id/imageButton9"
@@ -57,18 +57,20 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/imageView"
         app:layout_constraintVertical_bias="0.819"
-        app:srcCompat="@drawable/okay" />
+        app:srcCompat="@drawable/okay"
+        android:contentDescription="@string/apply_filter" />
 
     <EditText
         android:id="@+id/myEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter text here"
+        android:hint="@string/enter_text_here"
         app:layout_constraintBottom_toTopOf="@+id/imageButton9"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.88" />
+        app:layout_constraintVertical_bias="0.88"
+        android:autofillHints="I am Bill Cypher" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

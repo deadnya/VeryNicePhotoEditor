@@ -110,7 +110,7 @@ class Filters {
             return@withContext destBitmap
         }
 
-     fun pixelateBitmap(bitmap: Bitmap, pixelSize: Int): Bitmap {
+    fun pixelateBitmap(bitmap: Bitmap, pixelSize: Int): Bitmap {
         val width = bitmap.width
         val height = bitmap.height
 
@@ -129,8 +129,8 @@ class Filters {
 
                     while (yy <= y + pixelSize / 2.0) {
                         newBitmap.setPixel(
-                            Math.min(width - 1, Math.max(0, Math.round(xx).toInt())),
-                            Math.min(height - 1, Math.max(0, Math.round(yy).toInt())),
+                            (width - 1).coerceAtMost(0.coerceAtLeast(Math.round(xx).toInt())),
+                            (height - 1).coerceAtMost(0.coerceAtLeast(Math.round(yy).toInt())),
                             pixel
                         )
 
@@ -144,6 +144,7 @@ class Filters {
 
         return newBitmap
     }
+
     suspend fun applySepia(bitmap: Bitmap, value: Double): Bitmap =
         withContext(Dispatchers.Default) {
 
