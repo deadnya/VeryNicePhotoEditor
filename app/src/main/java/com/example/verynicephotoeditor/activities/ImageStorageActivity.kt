@@ -48,7 +48,6 @@ class ImageStorageActivity : AppCompatActivity() {
                 Toast.makeText(this, "No image selected", Toast.LENGTH_SHORT).show()
             }
         }
-
     private fun saveImageToGallery(bitmap: Bitmap) {
         val filename = "${System.currentTimeMillis()}.jpg"
         var fos: OutputStream? = null
@@ -138,7 +137,6 @@ class ImageStorageActivity : AppCompatActivity() {
                 saveImageToGallery(bitmap)
             }
         }
-
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
         recyclerView.adapter = ButtonAdapter(buttonList, supportFragmentManager)
         recyclerView.layoutManager =
