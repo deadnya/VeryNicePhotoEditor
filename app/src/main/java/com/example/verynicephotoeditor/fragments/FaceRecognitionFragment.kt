@@ -15,10 +15,12 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.verynicephotoeditor.R
 import com.example.verynicephotoeditor.SharedViewModel
 import com.example.verynicephotoeditor.activities.MainActivity
+import com.example.verynicephotoeditor.algorithms.task7.FaceRecognition
 
 class FaceRecognitionFragment : Fragment() {
 
     private lateinit var sharedViewModel: SharedViewModel
+    private lateinit var faceRecognition: FaceRecognition
 
     private val takePictureLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -31,20 +33,27 @@ class FaceRecognitionFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val imageButton8 = view.findViewById<ImageButton>(R.id.imageButton8)
+        faceRecognition = FaceRecognition(requireContext())
 
         imageButton8.setOnClickListener {
             val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
             takePictureLauncher.launch(takePictureIntent)
         }
 
-
         val imageButton9 = view.findViewById<ImageButton>(R.id.imageButton9)
         imageButton9.setOnClickListener {
 
             sharedViewModel = ViewModelProvider(requireActivity())[SharedViewModel::class.java]
 
-            val bitmap = sharedViewModel.bitmap.value
+            var bitmap = sharedViewModel.bitmap.value
+            if (bitmap != null) {
+                bitmap = bitmap.copy(Bitmap.Config.ARGB_8888,true)
+            }
+            val processedBitmap = faceRecognition.processImage(bitmap!!)
 
+            if (processedBitmap != null) {
+                sharedViewModel.setBitmap(processedBitmap)
+            }
         }
 
         view.findViewById<ImageButton>(R.id.backPanel).setOnClickListener {

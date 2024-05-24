@@ -6,7 +6,6 @@ import android.content.ContentValues
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -42,13 +41,9 @@ class ImageStorageActivity : AppCompatActivity() {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 val imageUri = result.data?.data
-                if (imageUri != null) {
-                    val source = ImageDecoder.createSource(contentResolver, imageUri)
-                    val bitmap = ImageDecoder.decodeBitmap(source)
-
-                    binding.mainImage.setImageBitmap(bitmap)
-                    sharedViewModel.setBitmap(bitmap)
-                }
+                val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, imageUri)
+                val softwareBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
+                sharedViewModel.setBitmap(softwareBitmap)
             } else {
                 Toast.makeText(this, "No image selected", Toast.LENGTH_SHORT).show()
             }

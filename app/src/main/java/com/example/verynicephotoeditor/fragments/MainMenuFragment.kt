@@ -14,7 +14,6 @@ import android.graphics.ImageDecoder
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -48,7 +47,7 @@ class MainMenuFragment : Fragment() {
                 val source = ImageDecoder.createSource(requireContext().contentResolver, imageUri!!)
                 var bitmap = ImageDecoder.decodeBitmap(source)
 
-                // Check if the bitmap is hardware accelerated
+
                 if (bitmap.config == Bitmap.Config.HARDWARE) {
                     bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
                 }
@@ -67,7 +66,7 @@ class MainMenuFragment : Fragment() {
                 intent.putExtra("imagePath", file.absolutePath)
                 startActivity(intent)
 
-                Log.d("AAA", "AAA")
+
             }
         }
 
@@ -81,7 +80,7 @@ class MainMenuFragment : Fragment() {
                         ImageDecoder.createSource(requireContext().contentResolver, imageUri)
                     var bitmap = ImageDecoder.decodeBitmap(source)
 
-                    // Check if the bitmap is hardware accelerated
+
                     if (bitmap.config == Bitmap.Config.HARDWARE) {
                         bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
                     }
@@ -124,7 +123,7 @@ class MainMenuFragment : Fragment() {
                         ImageDecoder.createSource(requireContext().contentResolver, imageUri)
                     var bitmap = ImageDecoder.decodeBitmap(source)
 
-                    // Check if the bitmap is hardware accelerated
+
                     if (bitmap.config == Bitmap.Config.HARDWARE) {
                         bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
                     }
