@@ -21,6 +21,7 @@ import com.example.verynicephotoeditor.algorithms.task2.Filters
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class GlassFragment : Fragment() {
 
@@ -66,10 +67,11 @@ class GlassFragment : Fragment() {
             if (bitmap != null) {
                 CoroutineScope(Dispatchers.Default).launch {
                     val filteredBitmap = Filters().applyGlass(bitmap, seekBar.progress.toDouble())
-                    sharedViewModel.setBitmap(filteredBitmap)
+                    withContext(Dispatchers.Main) {
+                        sharedViewModel.setBitmap(filteredBitmap)
+                    }
                 }
             }
-
         }
 
         view.findViewById<ImageButton>(R.id.backPanel).setOnClickListener {

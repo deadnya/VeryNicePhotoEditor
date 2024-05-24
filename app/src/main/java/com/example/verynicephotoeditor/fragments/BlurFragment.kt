@@ -21,6 +21,7 @@ import com.example.verynicephotoeditor.algorithms.task2.Filters
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class BlurFragment : Fragment() {
 
@@ -75,7 +76,9 @@ class BlurFragment : Fragment() {
             if (bitmap != null) {
                 CoroutineScope(Dispatchers.Default).launch {
                     val filteredBitmap = Filters().applyGaussBlur(bitmap, actualProgress)
-                    sharedViewModel.setBitmap(filteredBitmap)
+                    withContext(Dispatchers.Main) {
+                        sharedViewModel.setBitmap(filteredBitmap)
+                    }
                 }
             }
         }

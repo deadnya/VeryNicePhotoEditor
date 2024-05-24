@@ -5,9 +5,6 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.provider.MediaStore
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -21,6 +18,7 @@ import com.example.verynicephotoeditor.R
 import com.example.verynicephotoeditor.SharedViewModel
 import com.example.verynicephotoeditor.activities.MainActivity
 import com.example.verynicephotoeditor.algorithms.task2.Filters
+
 
 class PixelateFragment : Fragment() {
 
@@ -64,12 +62,10 @@ class PixelateFragment : Fragment() {
 
             val bitmap = sharedViewModel.bitmap.value
             if (bitmap != null) {
-                CoroutineScope(Dispatchers.Default).launch {
-                    val filteredBitmap = Filters().pixelateBitmap(bitmap, seekBar.progress)
-                    sharedViewModel.setBitmap(filteredBitmap)
-                }
-            }
 
+                    val filteredBitmap = Filters().pixelateBitmap(bitmap, seekBar.progress)
+                        sharedViewModel.setBitmap(filteredBitmap)
+                }
         }
 
         view.findViewById<ImageButton>(R.id.backPanel).setOnClickListener {

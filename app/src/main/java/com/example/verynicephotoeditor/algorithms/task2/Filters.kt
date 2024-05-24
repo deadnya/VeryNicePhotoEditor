@@ -5,7 +5,6 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
-import kotlinx.coroutines.Deferred
 import kotlin.math.PI
 import kotlin.math.exp
 import kotlin.math.pow
@@ -111,56 +110,40 @@ class Filters {
             return@withContext destBitmap
         }
 
-    suspend fun pixelateBitmap(bitmap: Bitmap, pixelSize: Int): Bitmap =
-        withContext(Dispatchers.Default) {
-            val width = bitmap.width
-            val height = bitmap.height
+     fun pixelateBitmap(bitmap: Bitmap, pixelSize: Int): Bitmap {
+        val width = bitmap.width
+        val height = bitmap.height
 
-            val newBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val newBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
 
-            val jobs = mutableListOf<Deferred<Unit>>()
+        for (x in 0 until width step pixelSize) {
+            for (y in 0 until height step pixelSize) {
 
-            for (x in 0 until width step pixelSize) {
-                for (y in 0 until height step pixelSize) {
+                val pixel = bitmap.getPixel(x, y)
 
-                    val pixel = bitmap.getPixel(x, y)
+                var xx = 0.0.coerceAtLeast(x - pixelSize / 2.0)
 
-                    var xx = 0.0.coerceAtLeast(x - pixelSize / 2.0)
+                while (xx <= x + pixelSize / 2.0) {
 
-                    while (xx <= x + pixelSize / 2.0) {
+                    var yy = 0.0.coerceAtLeast(y - pixelSize / 2.0)
 
-                        var yy = 0.0.coerceAtLeast(y - pixelSize / 2.0)
+                    while (yy <= y + pixelSize / 2.0) {
+                        newBitmap.setPixel(
+                            Math.min(width - 1, Math.max(0, Math.round(xx).toInt())),
+                            Math.min(height - 1, Math.max(0, Math.round(yy).toInt())),
+                            pixel
+                        )
 
-                        while (yy <= y + pixelSize / 2.0) {
-                            jobs.add(async {
-                                newBitmap.setPixel(
-                                    (width - 1).coerceAtMost(
-                                        0.coerceAtLeast(
-                                            Math.round(xx).toInt()
-                                        )
-                                    ),
-                                    (height - 1).coerceAtMost(
-                                        0.coerceAtLeast(
-                                            Math.round(yy).toInt()
-                                        )
-                                    ),
-                                    pixel
-                                )
-                            })
-
-                            yy++
-                        }
-
-                        xx++
+                        yy++
                     }
+
+                    xx++
                 }
             }
-
-            jobs.awaitAll()
-
-            return@withContext newBitmap
         }
 
+        return newBitmap
+    }
     suspend fun applySepia(bitmap: Bitmap, value: Double): Bitmap =
         withContext(Dispatchers.Default) {
 
