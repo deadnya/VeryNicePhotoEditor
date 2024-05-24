@@ -23,6 +23,7 @@ import com.example.verynicephotoeditor.algorithms.task3.ScalingAlgorithms
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Locale
 
 class ScaleFragment : Fragment() {
 
@@ -52,9 +53,8 @@ class ScaleFragment : Fragment() {
 
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                seekBarValue.text = "Scaling factor: ${
-                    String.format("%.1f", progress * 0.1).toDouble()
-                }" + "\n" + "Current size: ${bitmap.width} x ${bitmap.height}"
+                val scalingFactor = progress * 0.1
+                seekBarValue.text = "Scaling factor: $scalingFactor\nCurrent size: ${bitmap.width} x ${bitmap.height}"
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -79,9 +79,7 @@ class ScaleFragment : Fragment() {
 
                 withContext(Dispatchers.Main) {
                     sharedViewModel.setBitmap(scaledBitmap)
-                    seekBarValue.text = "Scaling factor: ${
-                        String.format("%.1f", seekBar.progress * 0.1).toDouble()
-                    }" + "\n" + "Current size: ${scaledBitmap.width} x ${scaledBitmap.height}"
+                    seekBarValue.text = "Scaling factor: $scalingFactor\nCurrent size: ${scaledBitmap.width} x ${scaledBitmap.height}"
                 }
             }
         }

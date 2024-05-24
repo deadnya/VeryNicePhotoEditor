@@ -14,10 +14,12 @@ import android.widget.SeekBar
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.example.verynicephotoeditor.R
 import com.example.verynicephotoeditor.SharedViewModel
 import com.example.verynicephotoeditor.activities.MainActivity
 import com.example.verynicephotoeditor.algorithms.task2.Filters
+import kotlinx.coroutines.launch
 
 class MaskFragment : Fragment() {
 
@@ -75,19 +77,19 @@ class MaskFragment : Fragment() {
 
         val imageButton9 = view.findViewById<ImageButton>(R.id.imageButton9)
         imageButton9.setOnClickListener {
-
             sharedViewModel = ViewModelProvider(requireActivity())[SharedViewModel::class.java]
 
             val bitmap = sharedViewModel.bitmap.value
             if (bitmap != null) {
-                val filteredBitmap = Filters().applyUnsharpMask(
-                    bitmap,
-                    seekBarString.progress / 100.0,
-                    actualProgress
-                )
-                sharedViewModel.setBitmap(filteredBitmap)
+                lifecycleScope.launch {
+                    val filteredBitmap = Filters().applyUnsharpMask(
+                        bitmap,
+                        seekBarString.progress / 100.0,
+                        actualProgress
+                    )
+                    sharedViewModel.setBitmap(filteredBitmap)
+                }
             }
-
         }
 
         view.findViewById<ImageButton>(R.id.backPanel).setOnClickListener {
