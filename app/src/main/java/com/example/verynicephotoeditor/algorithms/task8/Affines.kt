@@ -22,7 +22,7 @@ class Affines {
         val src = dotsList.subList(0, 3)
         val dst = dotsList.subList(3, 6)
 
-        val srcSmaller = listOf(
+        listOf(
             Dot(
                 bitmap.width / 2 + (dotsList[0].getX() - bitmap.width / 2) / 100,
                 bitmap.height / 2 + (dotsList[0].getY() - bitmap.height / 2) / 100
@@ -39,7 +39,7 @@ class Affines {
             )
         )
 
-        val srcBigger = listOf(
+        listOf(
             Dot(
                 bitmap.width / 2 - (dotsList[0].getX() - bitmap.width / 2) / 100,
                 bitmap.height / 2 - (dotsList[0].getY() - bitmap.height / 2) / 100
@@ -60,11 +60,11 @@ class Affines {
 
         val (scaleUpX, scaleUpY) = isImageBiggerOnXorYAxis(bitmap, matrix)
 
-        if (!scaleUpX && !scaleUpY) {
+        return if (!scaleUpX && !scaleUpY) {
 
-            return getBilinearTransformedBitmap(bitmap, matrix)
+            getBilinearTransformedBitmap(bitmap, matrix)
         } else {
-            return getBilinearTransformedBitmap(bitmap, matrix)
+            getBilinearTransformedBitmap(bitmap, matrix)
         }
     }
 
@@ -113,10 +113,10 @@ class Affines {
                     (inverseMatrix[3] * x + inverseMatrix[4] * y + inverseMatrix[5]).toFloat()
 
                 if (oldX.toInt() in 0 until bitmap.width && oldY.toInt() in 0 until bitmap.height) {
-
                     val pixel = bilinearInterpolation(oldX, oldY, bitmap)
 
-                    result.setPixel(x - newMinX.toInt(), y - newMinY.toInt(), pixel)
+                    val safeY = min(y - newMinY.toInt(), bitmap.height - 1)
+                    result.setPixel(x - newMinX.toInt(), safeY, pixel)
                 }
             }
         }
@@ -150,7 +150,7 @@ class Affines {
     private fun distance(point1: FloatArray, point2: FloatArray): Float {
         val dx = point2[0] - point1[0]
         val dy = point2[1] - point1[1]
-        return kotlin.math.sqrt(dx * dx + dy * dy)
+        return sqrt(dx * dx + dy * dy)
     }
 
     private fun calculateAffineTransformation(src: List<Dot>, dst: List<Dot>): DoubleArray {

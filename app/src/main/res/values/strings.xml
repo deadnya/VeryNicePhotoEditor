@@ -13,4 +13,10 @@
     <string name="enter_rotation_degree">Enter rotation degree</string>
     <string name="scaling_factor_0_1">Scaling factor: 0.1</string>
     <string name="degree_0">Degree: 0</string>
+    <string name="fxaa">FXAA</string>
+    <string name="spline_rectangle">Spline / Rectangle</string>
+    <string name="enable_filtrations_for_cube_image">Enable filtrations for cube image</string>
+    <string name="go_back">Go back</string>
+    <string name="canvas_for_cube">Canvas for cube</string>
+    <string name="canvas_for_splines">Canvas for splines</string>
 </resources>

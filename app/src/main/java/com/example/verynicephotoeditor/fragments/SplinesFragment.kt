@@ -1,6 +1,7 @@
 package com.example.verynicephotoeditor.fragments
 
 import android.annotation.SuppressLint
+import androidx.appcompat.widget.SwitchCompat
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Point
@@ -9,7 +10,6 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Switch
 import androidx.fragment.app.Fragment
 import com.example.verynicephotoeditor.R
 import com.example.verynicephotoeditor.algorithms.task5.MainDot
@@ -26,8 +26,8 @@ class SplinesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val modeSwitch: Switch = view.findViewById(R.id.modeSwitch)
-        val fxaaSwitch: Switch = view.findViewById(R.id.fxaaSwitch)
+        val modeSwitch: SwitchCompat = view.findViewById(R.id.modeSwitch)
+        val fxaaSwitch: SwitchCompat = view.findViewById(R.id.fxaaSwitch)
 
         val display = requireActivity().windowManager.defaultDisplay
         val size = Point()
@@ -120,7 +120,7 @@ class SplinesFragment : Fragment() {
                     val isModeSwitchChecked = modeSwitch.isChecked
                     val isFxaaSwitchChecked = fxaaSwitch.isChecked
 
-                    mutableBitmap.eraseColor(Color.WHITE);
+                    mutableBitmap.eraseColor(Color.WHITE)
                     Spline().update(
                         mainDotsList,
                         mutableBitmap,
@@ -191,7 +191,7 @@ class SplinesFragment : Fragment() {
                     val isModeSwitchChecked = modeSwitch.isChecked
                     val isFxaaSwitchChecked = fxaaSwitch.isChecked
 
-                    mutableBitmap.eraseColor(Color.WHITE);
+                    mutableBitmap.eraseColor(Color.WHITE)
                     Spline().update(
                         mainDotsList,
                         mutableBitmap,

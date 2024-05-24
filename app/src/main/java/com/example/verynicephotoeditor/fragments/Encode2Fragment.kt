@@ -3,7 +3,6 @@ package com.example.verynicephotoeditor.fragments
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.ImageDecoder
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
@@ -27,13 +26,13 @@ class Encode2Fragment : Fragment() {
 
     private lateinit var uploadedBitmap: Bitmap
 
-    @RequiresApi(Build.VERSION_CODES.P)
+    @RequiresApi(Build.VERSION_CODES.O)
     private val pickImage =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 val imageUri = result.data?.data
-                val source = ImageDecoder.createSource(requireContext().contentResolver, imageUri!!)
-                var bitmap = ImageDecoder.decodeBitmap(source)
+                var bitmap =
+                    MediaStore.Images.Media.getBitmap(requireContext().contentResolver, imageUri)
 
                 // Check if the bitmap is hardware accelerated
                 if (bitmap.config == Bitmap.Config.HARDWARE) {
@@ -48,7 +47,7 @@ class Encode2Fragment : Fragment() {
             }
         }
 
-    @RequiresApi(Build.VERSION_CODES.P)
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 

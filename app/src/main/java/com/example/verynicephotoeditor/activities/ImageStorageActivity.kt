@@ -14,7 +14,6 @@ import android.provider.MediaStore
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.commit
 import androidx.lifecycle.ViewModelProvider
@@ -36,18 +35,17 @@ class ImageStorageActivity : AppCompatActivity() {
     private lateinit var binding: ActivityImageStorageBinding
     private lateinit var sharedViewModel: SharedViewModel
 
-    @RequiresApi(Build.VERSION_CODES.P)
     private val pickImage =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 val imageUri = result.data?.data
                 val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, imageUri)
-                val softwareBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
-                sharedViewModel.setBitmap(softwareBitmap)
+                sharedViewModel.setBitmap(bitmap)
             } else {
                 Toast.makeText(this, "No image selected", Toast.LENGTH_SHORT).show()
             }
         }
+
     private fun saveImageToGallery(bitmap: Bitmap) {
         val filename = "${System.currentTimeMillis()}.jpg"
         var fos: OutputStream? = null
@@ -75,15 +73,12 @@ class ImageStorageActivity : AppCompatActivity() {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
         val imagePath = intent.getStringExtra("imagePath")
         val bitmap = BitmapFactory.decodeFile(imagePath)
-
-
 
         binding = ActivityImageStorageBinding.inflate(layoutInflater)
         setContentView(binding.root)

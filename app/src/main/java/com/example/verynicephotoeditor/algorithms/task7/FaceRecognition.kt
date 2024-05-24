@@ -18,19 +18,19 @@ class FaceRecognition(private val context: Context) {
     fun processImage(bitmap: Bitmap): Bitmap? {
         val image = TensorImage.fromBitmap(bitmap)
         val imageProcessor =
-            ImageProcessor.Builder().add(ResizeOp(300, 300, ResizeOp.ResizeMethod.BILINEAR))
+            ImageProcessor.Builder().add(ResizeOp(320, 320, ResizeOp.ResizeMethod.BILINEAR))
                 .build()
         val input = imageProcessor.process(image)
 
         val model = Model.newInstance(context)
 
         val inputFeature0 =
-            TensorBuffer.createFixedSize(intArrayOf(1, 300, 300, 3), DataType.UINT8)
+            TensorBuffer.createFixedSize(intArrayOf(1, 320, 320, 3), DataType.UINT8)
         inputFeature0.loadBuffer(input.buffer)
 
-        val outputs = model.process(inputFeature0)
-        val locations = outputs.outputFeature0AsTensorBuffer.floatArray
-        val scores = outputs.outputFeature2AsTensorBuffer.floatArray
+        val outputs = model.process(image)
+        val locations = outputs.locationAsTensorBuffer.floatArray
+        val scores = outputs.scoreAsTensorBuffer.floatArray
         val mutable = bitmap.copy(Bitmap.Config.ARGB_8888, true)
         val height = mutable.height
         val width = mutable.width

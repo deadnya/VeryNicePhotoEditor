@@ -76,7 +76,8 @@ class WaveFragment : Fragment() {
             val bitmap = sharedViewModel.bitmap.value
             if (bitmap != null) {
                 lifecycleScope.launch {
-                    val filteredBitmap = Filters().applyWave(bitmap, seekbarA.progress, seekbarB.progress)
+                    val filteredBitmap =
+                        Filters().applyWave(bitmap, seekbarA.progress, seekbarB.progress)
                     sharedViewModel.setBitmap(filteredBitmap)
                 }
             }

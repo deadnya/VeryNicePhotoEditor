@@ -568,7 +568,8 @@ class Filters {
                                 for (yy in y - neighbourhood..y + neighbourhood) {
 
                                     val currX = (bitmap.width - 1).coerceAtMost(xx).coerceAtLeast(0)
-                                    val currY = (bitmap.height - 1).coerceAtMost(yy).coerceAtLeast(0)
+                                    val currY =
+                                        (bitmap.height - 1).coerceAtMost(yy).coerceAtLeast(0)
 
                                     val currPixel = bitmap.getPixel(currX, currY)
 

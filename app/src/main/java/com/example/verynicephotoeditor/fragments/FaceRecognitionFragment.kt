@@ -47,7 +47,7 @@ class FaceRecognitionFragment : Fragment() {
 
             var bitmap = sharedViewModel.bitmap.value
             if (bitmap != null) {
-                bitmap = bitmap.copy(Bitmap.Config.ARGB_8888,true)
+                bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
             }
             val processedBitmap = faceRecognition.processImage(bitmap!!)
 

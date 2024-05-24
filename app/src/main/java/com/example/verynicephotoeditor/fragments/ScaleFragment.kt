@@ -54,7 +54,12 @@ class ScaleFragment : Fragment() {
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 val scalingFactor = progress * 0.1
-                seekBarValue.text = "Scaling factor: ${String.format("%.1f", scalingFactor)}\nCurrent size: ${bitmap.width} x ${bitmap.height}"
+                seekBarValue.text = "Scaling factor: ${
+                    String.format(
+                        "%.1f",
+                        scalingFactor
+                    )
+                }\nCurrent size: ${bitmap.width} x ${bitmap.height}"
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -79,7 +84,8 @@ class ScaleFragment : Fragment() {
 
                 withContext(Dispatchers.Main) {
                     sharedViewModel.setBitmap(scaledBitmap)
-                    seekBarValue.text = "Scaling factor: $scalingFactor\nCurrent size: ${scaledBitmap.width} x ${scaledBitmap.height}"
+                    seekBarValue.text =
+                        "Scaling factor: $scalingFactor\nCurrent size: ${scaledBitmap.width} x ${scaledBitmap.height}"
                 }
             }
         }

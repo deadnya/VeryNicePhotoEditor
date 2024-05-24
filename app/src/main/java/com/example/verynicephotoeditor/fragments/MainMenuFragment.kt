@@ -10,7 +10,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.ImageDecoder
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
@@ -39,15 +38,15 @@ class MainMenuFragment : Fragment() {
     private lateinit var startingBitmap: Bitmap
     private lateinit var permissionsViewModel: PermissionsViewModel
 
-    @RequiresApi(Build.VERSION_CODES.P)
+    @RequiresApi(Build.VERSION_CODES.O)
     private val pickImage =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 val imageUri = result.data?.data
-                val source = ImageDecoder.createSource(requireContext().contentResolver, imageUri!!)
-                var bitmap = ImageDecoder.decodeBitmap(source)
+                var bitmap =
+                    MediaStore.Images.Media.getBitmap(requireContext().contentResolver, imageUri)
 
-
+                // Check if the bitmap is hardware accelerated
                 if (bitmap.config == Bitmap.Config.HARDWARE) {
                     bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
                 }
@@ -65,21 +64,19 @@ class MainMenuFragment : Fragment() {
                 val intent = Intent(requireContext(), ImageStorageActivity::class.java)
                 intent.putExtra("imagePath", file.absolutePath)
                 startActivity(intent)
-
-
             }
         }
 
-    @RequiresApi(Build.VERSION_CODES.P)
+    @RequiresApi(Build.VERSION_CODES.O)
     private val pickImageForRetush =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 val imageUri = result.data?.data
                 if (imageUri != null) {
-                    val source =
-                        ImageDecoder.createSource(requireContext().contentResolver, imageUri)
-                    var bitmap = ImageDecoder.decodeBitmap(source)
-
+                    var bitmap = MediaStore.Images.Media.getBitmap(
+                        requireContext().contentResolver,
+                        imageUri
+                    )
 
                     if (bitmap.config == Bitmap.Config.HARDWARE) {
                         bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
@@ -98,8 +95,6 @@ class MainMenuFragment : Fragment() {
                     val intent = Intent(requireContext(), RetushActivity::class.java)
                     intent.putExtra("imagePath", file.absolutePath)
                     startActivity(intent)
-
-
                 } else {
                     Toast.makeText(requireContext(), "Failed to pick image", Toast.LENGTH_SHORT)
                         .show()
@@ -113,16 +108,16 @@ class MainMenuFragment : Fragment() {
             }
         }
 
-    @RequiresApi(Build.VERSION_CODES.P)
+    @RequiresApi(Build.VERSION_CODES.O)
     private val pickImageForAffines =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 val imageUri = result.data?.data
                 if (imageUri != null) {
-                    val source =
-                        ImageDecoder.createSource(requireContext().contentResolver, imageUri)
-                    var bitmap = ImageDecoder.decodeBitmap(source)
-
+                    var bitmap = MediaStore.Images.Media.getBitmap(
+                        requireContext().contentResolver,
+                        imageUri
+                    )
 
                     if (bitmap.config == Bitmap.Config.HARDWARE) {
                         bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
@@ -141,7 +136,6 @@ class MainMenuFragment : Fragment() {
                     val intent = Intent(requireContext(), AffineActivity::class.java)
                     intent.putExtra("imagePath", file.absolutePath)
                     startActivity(intent)
-
                 } else {
                     Toast.makeText(requireContext(), "Failed to pick image", Toast.LENGTH_SHORT)
                         .show()
@@ -155,7 +149,7 @@ class MainMenuFragment : Fragment() {
             }
         }
 
-    @RequiresApi(Build.VERSION_CODES.P)
+    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("MissingInflatedId")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

@@ -189,52 +189,50 @@ class SpinningCube {
             )
         }
 
-        if (translatedCube.dot1.z != zDots[7]) drawDot(mutableBitmap, 10, translatedCube.dot1, size)
-        if (translatedCube.dot2.z != zDots[7]) drawDot(mutableBitmap, 10, translatedCube.dot2, size)
-        if (translatedCube.dot3.z != zDots[7]) drawDot(mutableBitmap, 10, translatedCube.dot3, size)
-        if (translatedCube.dot4.z != zDots[7]) drawDot(mutableBitmap, 10, translatedCube.dot4, size)
-        if (translatedCube.dot5.z != zDots[7]) drawDot(mutableBitmap, 10, translatedCube.dot5, size)
-        if (translatedCube.dot6.z != zDots[7]) drawDot(mutableBitmap, 10, translatedCube.dot6, size)
-        if (translatedCube.dot7.z != zDots[7]) drawDot(mutableBitmap, 10, translatedCube.dot7, size)
-        if (translatedCube.dot8.z != zDots[7]) drawDot(mutableBitmap, 10, translatedCube.dot8, size)
-
-        val stroke = 2
+        if (translatedCube.dot1.z != zDots[7]) drawDot(mutableBitmap, translatedCube.dot1, size)
+        if (translatedCube.dot2.z != zDots[7]) drawDot(mutableBitmap, translatedCube.dot2, size)
+        if (translatedCube.dot3.z != zDots[7]) drawDot(mutableBitmap, translatedCube.dot3, size)
+        if (translatedCube.dot4.z != zDots[7]) drawDot(mutableBitmap, translatedCube.dot4, size)
+        if (translatedCube.dot5.z != zDots[7]) drawDot(mutableBitmap, translatedCube.dot5, size)
+        if (translatedCube.dot6.z != zDots[7]) drawDot(mutableBitmap, translatedCube.dot6, size)
+        if (translatedCube.dot7.z != zDots[7]) drawDot(mutableBitmap, translatedCube.dot7, size)
+        if (translatedCube.dot8.z != zDots[7]) drawDot(mutableBitmap, translatedCube.dot8, size)
 
         if (translatedCube.dot1.z != zDots[7] && translatedCube.dot5.z != zDots[7])
-            drawLine(mutableBitmap, translatedCube.dot1, translatedCube.dot5, stroke, size)
+            drawLine(mutableBitmap, translatedCube.dot1, translatedCube.dot5, size)
 
         if (translatedCube.dot2.z != zDots[7] && translatedCube.dot6.z != zDots[7])
-            drawLine(mutableBitmap, translatedCube.dot2, translatedCube.dot6, stroke, size)
+            drawLine(mutableBitmap, translatedCube.dot2, translatedCube.dot6, size)
 
         if (translatedCube.dot3.z != zDots[7] && translatedCube.dot7.z != zDots[7])
-            drawLine(mutableBitmap, translatedCube.dot3, translatedCube.dot7, stroke, size)
+            drawLine(mutableBitmap, translatedCube.dot3, translatedCube.dot7, size)
 
         if (translatedCube.dot4.z != zDots[7] && translatedCube.dot8.z != zDots[7])
-            drawLine(mutableBitmap, translatedCube.dot4, translatedCube.dot8, stroke, size)
+            drawLine(mutableBitmap, translatedCube.dot4, translatedCube.dot8, size)
 
         if (translatedCube.dot1.z != zDots[7] && translatedCube.dot2.z != zDots[7])
-            drawLine(mutableBitmap, translatedCube.dot1, translatedCube.dot2, stroke, size)
+            drawLine(mutableBitmap, translatedCube.dot1, translatedCube.dot2, size)
 
         if (translatedCube.dot2.z != zDots[7] && translatedCube.dot3.z != zDots[7])
-            drawLine(mutableBitmap, translatedCube.dot2, translatedCube.dot3, stroke, size)
+            drawLine(mutableBitmap, translatedCube.dot2, translatedCube.dot3, size)
 
         if (translatedCube.dot3.z != zDots[7] && translatedCube.dot4.z != zDots[7])
-            drawLine(mutableBitmap, translatedCube.dot3, translatedCube.dot4, stroke, size)
+            drawLine(mutableBitmap, translatedCube.dot3, translatedCube.dot4, size)
 
         if (translatedCube.dot4.z != zDots[7] && translatedCube.dot1.z != zDots[7])
-            drawLine(mutableBitmap, translatedCube.dot4, translatedCube.dot1, stroke, size)
+            drawLine(mutableBitmap, translatedCube.dot4, translatedCube.dot1, size)
 
         if (translatedCube.dot5.z != zDots[7] && translatedCube.dot6.z != zDots[7])
-            drawLine(mutableBitmap, translatedCube.dot5, translatedCube.dot6, stroke, size)
+            drawLine(mutableBitmap, translatedCube.dot5, translatedCube.dot6, size)
 
         if (translatedCube.dot6.z != zDots[7] && translatedCube.dot7.z != zDots[7])
-            drawLine(mutableBitmap, translatedCube.dot6, translatedCube.dot7, stroke, size)
+            drawLine(mutableBitmap, translatedCube.dot6, translatedCube.dot7, size)
 
         if (translatedCube.dot7.z != zDots[7] && translatedCube.dot8.z != zDots[7])
-            drawLine(mutableBitmap, translatedCube.dot7, translatedCube.dot8, stroke, size)
+            drawLine(mutableBitmap, translatedCube.dot7, translatedCube.dot8, size)
 
         if (translatedCube.dot8.z != zDots[7] && translatedCube.dot5.z != zDots[7])
-            drawLine(mutableBitmap, translatedCube.dot8, translatedCube.dot5, stroke, size)
+            drawLine(mutableBitmap, translatedCube.dot8, translatedCube.dot5, size)
     }
 
     private fun affinTransmutation(bitmap: Bitmap, dotsList: List<Dot>): Bitmap {
@@ -245,7 +243,7 @@ class SpinningCube {
         val matrix = calculateAffineTransformation(src, dst)
         val inverseMatrix = calculateInverse(matrix)
 
-        val (scaleUpX, scaleUpY) = isImageBiggerOnXorYAxis(bitmap, matrix)
+        val (_, _) = isImageBiggerOnXorYAxis(bitmap, matrix)
 
         var newMinX = Double.MAX_VALUE
         var newMaxX = Double.MIN_VALUE
@@ -318,7 +316,7 @@ class SpinningCube {
     private fun distance(point1: FloatArray, point2: FloatArray): Float {
         val dx = point2[0] - point1[0]
         val dy = point2[1] - point1[1]
-        return kotlin.math.sqrt(dx * dx + dy * dy)
+        return sqrt(dx * dx + dy * dy)
     }
 
     private fun calculateAffineTransformation(src: List<Dot>, dst: List<Dot>): DoubleArray {
@@ -328,18 +326,18 @@ class SpinningCube {
             (src[0].x - src[2].x) * (src[1].y - src[2].y) - (src[1].x - src[2].x) * (src[0].y - src[2].y)
 
         matrix[0] =
-            (((dst[0].x - dst[2].x) * (src[1].y - src[2].y) - (dst[1].x - dst[2].x) * (src[0].y - src[2].y)) / denominator).toDouble()
+            (((dst[0].x - dst[2].x) * (src[1].y - src[2].y) - (dst[1].x - dst[2].x) * (src[0].y - src[2].y)) / denominator)
         matrix[1] =
-            (((dst[1].x - dst[2].x) * (src[0].x - src[2].x) - (dst[0].x - dst[2].x) * (src[1].x - src[2].x)) / denominator).toDouble()
+            (((dst[1].x - dst[2].x) * (src[0].x - src[2].x) - (dst[0].x - dst[2].x) * (src[1].x - src[2].x)) / denominator)
         matrix[2] =
-            ((src[2].x * (dst[1].x - dst[0].x) + src[2].y * (dst[0].x - dst[2].x) + src[0].x * dst[1].x - src[1].x * dst[0].x) / denominator).toDouble()
+            ((src[2].x * (dst[1].x - dst[0].x) + src[2].y * (dst[0].x - dst[2].x) + src[0].x * dst[1].x - src[1].x * dst[0].x) / denominator)
 
         matrix[3] =
-            (((dst[0].y - dst[2].y) * (src[1].y - src[2].y) - (dst[1].y - dst[2].y) * (src[0].y - src[2].y)) / denominator).toDouble()
+            (((dst[0].y - dst[2].y) * (src[1].y - src[2].y) - (dst[1].y - dst[2].y) * (src[0].y - src[2].y)) / denominator)
         matrix[4] =
-            (((dst[1].y - dst[2].y) * (src[0].x - src[2].x) - (dst[0].y - dst[2].y) * (src[1].x - src[2].x)) / denominator).toDouble()
+            (((dst[1].y - dst[2].y) * (src[0].x - src[2].x) - (dst[0].y - dst[2].y) * (src[1].x - src[2].x)) / denominator)
         matrix[5] =
-            ((src[2].x * (dst[1].y - dst[0].y) + src[2].y * (dst[0].y - dst[2].y) + src[0].x * dst[1].y - src[1].x * dst[0].y) / denominator).toDouble()
+            ((src[2].x * (dst[1].y - dst[0].y) + src[2].y * (dst[0].y - dst[2].y) + src[0].x * dst[1].y - src[1].x * dst[0].y) / denominator)
 
         return matrix
     }
@@ -396,13 +394,13 @@ class SpinningCube {
     }
 
 
-    private fun drawDot(mutableBitmap: Bitmap, dotSize: Int, dot: Dot, size: Point) {
+    private fun drawDot(mutableBitmap: Bitmap, dot: Dot, size: Point) {
 
         val x = (size.x / 2 + dot.x * 100).toInt()
         val y = (size.y / 2 + dot.y * 100).toInt()
 
-        for (xx in x - dotSize + 1..<x + dotSize) {
-            for (yy in y - dotSize + 1..<y + dotSize) {
+        for (xx in x - 10 + 1..<x + 10) {
+            for (yy in y - 10 + 1..<y + 10) {
 
                 val currX = xx.coerceAtMost(mutableBitmap.width - 1).coerceAtLeast(0)
                 val currY = yy.coerceAtMost(mutableBitmap.height - 1).coerceAtLeast(0)
@@ -412,7 +410,7 @@ class SpinningCube {
                         yy.toDouble(),
                         x.toDouble(),
                         y.toDouble()
-                    ) < dotSize
+                    ) < 10
                 ) {
 
                     mutableBitmap.setPixel(
@@ -432,7 +430,6 @@ class SpinningCube {
         mutableBitmap: Bitmap,
         dot1: Dot,
         dot2: Dot,
-        strokeSize: Int,
         size: Point
     ) {
 
@@ -454,8 +451,8 @@ class SpinningCube {
         var y = y1
 
         while (true) {
-            for (i in -strokeSize..strokeSize) {
-                for (j in -strokeSize..strokeSize) {
+            for (i in -2..2) {
+                for (j in -2..2) {
                     if (x + i in 0 until mutableBitmap.width && y + j in 0 until mutableBitmap.height) {
                         mutableBitmap.setPixel(x + i, y + j, Color.BLACK)
                     }
@@ -536,29 +533,6 @@ class Cube(
         matrix[2][0] = sin(angle * 0.5)
         matrix[1][1] = 1.0
         matrix[2][2] = cos(angle * 0.5)
-        matrix[3][3] = 1.0
-
-        dot1 = matrixMultiplication(dot1, matrix)
-        dot2 = matrixMultiplication(dot2, matrix)
-        dot3 = matrixMultiplication(dot3, matrix)
-        dot4 = matrixMultiplication(dot4, matrix)
-        dot5 = matrixMultiplication(dot5, matrix)
-        dot6 = matrixMultiplication(dot6, matrix)
-        dot7 = matrixMultiplication(dot7, matrix)
-        dot8 = matrixMultiplication(dot8, matrix)
-    }
-
-    fun rotateZ(distance: Double) {
-
-        val angle = distToAngle * distance
-
-        val matrix = m.toMutableList()
-
-        matrix[0][0] = cos(angle * 0.5)
-        matrix[0][1] = sin(angle * 0.5)
-        matrix[1][0] = -sin(angle * 0.5)
-        matrix[1][1] = cos(angle * 0.5)
-        matrix[2][2] = 1.0
         matrix[3][3] = 1.0
 
         dot1 = matrixMultiplication(dot1, matrix)
