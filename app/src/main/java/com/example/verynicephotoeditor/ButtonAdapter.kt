@@ -29,14 +29,18 @@ import com.example.verynicephotoeditor.fragments.SepiaFragment
 import com.example.verynicephotoeditor.fragments.SolarizeFragment
 import com.example.verynicephotoeditor.fragments.WaveFragment
 
-class ButtonAdapter(private val buttonList: List<ButtonModel>, private val fragmentManager: FragmentManager) : RecyclerView.Adapter<ButtonAdapter.ButtonViewHolder>() {
+class ButtonAdapter(
+    private val buttonList: List<ButtonModel>,
+    private val fragmentManager: FragmentManager
+) : RecyclerView.Adapter<ButtonAdapter.ButtonViewHolder>() {
 
     inner class ButtonViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val button: TextView = itemView.findViewById(R.id.textView)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ButtonViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.recycle_item_txt, parent, false)
+        val view =
+            LayoutInflater.from(parent.context).inflate(R.layout.recycle_item_txt, parent, false)
         return ButtonViewHolder(view)
     }
 
@@ -67,7 +71,7 @@ class ButtonAdapter(private val buttonList: List<ButtonModel>, private val fragm
                 "Decode2" -> Decode2Fragment()
                 "Encode3" -> Encode3Fragment()
                 "Decode3" -> Decode3Fragment()
-                "Face Recognition"-> FaceRecognitionFragment()
+                "Face Recognition" -> FaceRecognitionFragment()
                 else -> null
             }
 

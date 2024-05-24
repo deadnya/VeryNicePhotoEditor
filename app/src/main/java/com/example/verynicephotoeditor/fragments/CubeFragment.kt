@@ -18,7 +18,7 @@ import com.example.verynicephotoeditor.algorithms.task9.Dot
 import com.example.verynicephotoeditor.algorithms.task9.SpinningCube
 import com.example.verynicephotoeditor.databinding.FragmentCubeBinding
 
-class CubeFragment : Fragment()  {
+class CubeFragment : Fragment() {
 
     private lateinit var binding: FragmentCubeBinding
 
@@ -41,7 +41,13 @@ class CubeFragment : Fragment()  {
 
         size = Point(width, height)
 
-        binding.cubeCanvas.setImageBitmap(Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888))
+        binding.cubeCanvas.setImageBitmap(
+            Bitmap.createBitmap(
+                width,
+                height,
+                Bitmap.Config.ARGB_8888
+            )
+        )
         val bitmap = Filters().drawableToBitmap(binding.cubeCanvas.drawable)
         val mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
 

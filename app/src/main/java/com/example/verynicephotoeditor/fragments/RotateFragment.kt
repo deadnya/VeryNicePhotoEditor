@@ -101,8 +101,6 @@ class RotateFragment : Fragment() {
             }
         }
 
-
-
         view.findViewById<ImageButton>(R.id.backPanel).setOnClickListener {
             val intent = Intent(requireContext(), MainActivity::class.java)
             startActivity(intent)

@@ -23,12 +23,13 @@ class WaveFragment : Fragment() {
 
     private lateinit var sharedViewModel: SharedViewModel
 
-    private val takePictureLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val imageBitmap = result.data?.extras?.get("data") as Bitmap
-            sharedViewModel.setBitmap(imageBitmap)
+    private val takePictureLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val imageBitmap = result.data?.extras?.get("data") as Bitmap
+                sharedViewModel.setBitmap(imageBitmap)
+            }
         }
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -72,7 +73,8 @@ class WaveFragment : Fragment() {
 
             val bitmap = sharedViewModel.bitmap.value
             if (bitmap != null) {
-                val filteredBitmap = Filters().applyWave(bitmap, seekbarA.progress, seekbarB.progress)
+                val filteredBitmap =
+                    Filters().applyWave(bitmap, seekbarA.progress, seekbarB.progress)
                 sharedViewModel.setBitmap(filteredBitmap)
             }
 
