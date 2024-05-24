@@ -29,7 +29,11 @@ class Decode3Fragment : Fragment() {
 
             val bitmap = sharedViewModel.bitmap.value
             if (bitmap != null) {
-                Toast.makeText(requireContext(), Filters().decodeSteganographyText(bitmap), Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireContext(),
+                    Filters().decodeSteganographyText(bitmap),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
 
         }

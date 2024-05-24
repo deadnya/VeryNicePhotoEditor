@@ -523,7 +523,8 @@ class Spline {
         val grayMin = grayM.coerceAtMost(grayBR).coerceAtMost(grayBL.coerceAtMost(grayTR))
             .coerceAtMost(grayTL)
         val grayMax =
-            grayM.coerceAtLeast(grayBR).coerceAtLeast(grayBL.coerceAtLeast(grayTR)).coerceAtLeast(grayTL)
+            grayM.coerceAtLeast(grayBR).coerceAtLeast(grayBL.coerceAtLeast(grayTR))
+                .coerceAtLeast(grayTL)
 
         val grayRes2 = getGrayscaleValue(result2)
 

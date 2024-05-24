@@ -24,12 +24,13 @@ class SolarizeFragment : Fragment() {
 
     private lateinit var sharedViewModel: SharedViewModel
 
-    private val takePictureLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val imageBitmap = result.data?.extras?.get("data") as Bitmap
-            sharedViewModel.setBitmap(imageBitmap)
+    private val takePictureLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val imageBitmap = result.data?.extras?.get("data") as Bitmap
+                sharedViewModel.setBitmap(imageBitmap)
+            }
         }
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -61,7 +62,12 @@ class SolarizeFragment : Fragment() {
 
             val bitmap = sharedViewModel.bitmap.value
             if (bitmap != null) {
-                val filteredBitmap = Filters().applySolarize(bitmap, seekBar.progress, seekBar.progress, seekBar.progress)
+                val filteredBitmap = Filters().applySolarize(
+                    bitmap,
+                    seekBar.progress,
+                    seekBar.progress,
+                    seekBar.progress
+                )
                 sharedViewModel.setBitmap(filteredBitmap)
             }
         }
