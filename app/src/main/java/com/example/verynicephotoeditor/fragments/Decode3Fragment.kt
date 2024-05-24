@@ -2,7 +2,6 @@ package com.example.verynicephotoeditor.fragments
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -10,14 +9,10 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import com.example.verynicephotoeditor.R
 import com.example.verynicephotoeditor.SharedViewModel
 import com.example.verynicephotoeditor.activities.MainActivity
 import com.example.verynicephotoeditor.algorithms.task2.Filters
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class Decode3Fragment : Fragment() {
 
@@ -29,20 +24,17 @@ class Decode3Fragment : Fragment() {
         val imageButton9 = view.findViewById<ImageButton>(R.id.imageButton9)
         imageButton9.setOnClickListener {
 
-            sharedViewModel = ViewModelProvider(requireActivity()).get(SharedViewModel::class.java)
+            sharedViewModel = ViewModelProvider(requireActivity())[SharedViewModel::class.java]
 
             val bitmap = sharedViewModel.bitmap.value
             if (bitmap != null) {
-                lifecycleScope.launch {
-                    val decodedText = Filters().decodeSteganographyText(bitmap)
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(
-                            requireContext(),
-                            decodedText,
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }
+                val decodedText = Filters().decodeSteganographyText(bitmap)
+                Toast.makeText(
+                    requireContext(),
+                    decodedText,
+                    Toast.LENGTH_SHORT
+                ).show()
+
             }
 
         }

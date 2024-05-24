@@ -125,7 +125,7 @@ class ImageStorageActivity : AppCompatActivity() {
             ButtonModel("Encode3"),
             ButtonModel("Decode3"),
             ButtonModel("Face Recognition"),
-            ButtonModel("")
+            ButtonModel(" ")
         )
         binding.galleryButton.setOnClickListener {
             val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)

@@ -5,7 +5,9 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -62,8 +64,10 @@ class PixelateFragment : Fragment() {
 
             val bitmap = sharedViewModel.bitmap.value
             if (bitmap != null) {
-                val filteredBitmap = Filters().pixelateBitmap(bitmap, seekBar.progress)
-                sharedViewModel.setBitmap(filteredBitmap)
+                CoroutineScope(Dispatchers.Default).launch {
+                    val filteredBitmap = Filters().pixelateBitmap(bitmap, seekBar.progress)
+                    sharedViewModel.setBitmap(filteredBitmap)
+                }
             }
 
         }
