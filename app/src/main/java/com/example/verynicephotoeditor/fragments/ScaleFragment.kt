@@ -67,10 +67,9 @@ class ScaleFragment : Fragment() {
             sharedViewModel = ViewModelProvider(requireActivity())[SharedViewModel::class.java]
 
             val bitmap = sharedViewModel.bitmap.value!!
-            val scalingFactor = String.format("%.1f", seekBar.progress * 0.1).toDouble()
-
 
             lifecycleScope.launch(Dispatchers.Default) {
+                val scalingFactor = seekBar.progress * 0.1
                 val scalingAlgorithms = ScalingAlgorithms()
                 val scaledBitmap = if (scalingFactor < 1) {
                     scalingAlgorithms.scaleImageTrilinear(bitmap, scalingFactor)
@@ -80,11 +79,10 @@ class ScaleFragment : Fragment() {
 
                 withContext(Dispatchers.Main) {
                     sharedViewModel.setBitmap(scaledBitmap)
-
+                    seekBarValue.text = "Scaling factor: ${
+                        String.format("%.1f", seekBar.progress * 0.1).toDouble()
+                    }" + "\n" + "Current size: ${scaledBitmap.width} x ${scaledBitmap.height}"
                 }
-                seekBarValue.text = "Scaling factor: ${
-                    String.format("%.1f", seekBar.progress * 0.1).toDouble()
-                }" + "\n" + "Current size: ${bitmap.width} x ${bitmap.height}"
             }
         }
         view.findViewById<ImageButton>(R.id.backPanel).setOnClickListener {
@@ -93,7 +91,6 @@ class ScaleFragment : Fragment() {
         }
 
     }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?

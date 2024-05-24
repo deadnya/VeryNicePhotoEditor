@@ -72,7 +72,15 @@ class RetushActivity : AppCompatActivity() {
                         val radius = binding.radiusSlider.progress + 3
                         val strength = binding.strengthSlider.progress / 100.0 + 0.1
 
-                        binding.imageView.setImageBitmap(Retush().applyEditing(bitmap, x, y, radius.toDouble(), strength))
+                        binding.imageView.setImageBitmap(
+                            Retush().applyEditing(
+                                bitmap,
+                                x,
+                                y,
+                                radius.toDouble(),
+                                strength
+                            )
+                        )
                     }
                 }
             }

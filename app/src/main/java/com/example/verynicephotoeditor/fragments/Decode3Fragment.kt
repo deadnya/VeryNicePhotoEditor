@@ -32,7 +32,6 @@ class Decode3Fragment : Fragment() {
                 Toast.makeText(requireContext(), Filters().decodeSteganographyText(bitmap), Toast.LENGTH_SHORT).show()
             }
 
-            Log.d("AAAA", "AAAA")
         }
 
         view.findViewById<ImageButton>(R.id.backPanel).setOnClickListener {

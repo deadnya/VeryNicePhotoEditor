@@ -7,7 +7,7 @@ import kotlin.math.sqrt
 
 class Retush {
 
-    fun applyEditing(bitmap: Bitmap, x: Int, y: Int, brushSize: Double, strength: Double) : Bitmap {
+    fun applyEditing(bitmap: Bitmap, x: Int, y: Int, brushSize: Double, strength: Double): Bitmap {
 
         val mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
 
@@ -16,11 +16,12 @@ class Retush {
         var blueSum = 0
         var pixelCount = 0
 
-        for (xx in x - Math.round(brushSize).toInt() + 1 .. (x + Math.round(brushSize).toInt() + 1)) {
-            for (yy in y - Math.round(brushSize).toInt() + 1 .. (y + Math.round(brushSize).toInt() + 1)) {
+        for (xx in x - Math.round(brushSize).toInt() + 1..(x + Math.round(brushSize).toInt() + 1)) {
+            for (yy in y - Math.round(brushSize).toInt() + 1..(y + Math.round(brushSize)
+                .toInt() + 1)) {
 
-                val currX = Math.max(Math.min(xx, bitmap.width - 1), 0)
-                val currY = Math.max(Math.min(yy, bitmap.height - 1), 0)
+                val currX = xx.coerceAtMost(bitmap.width - 1).coerceAtLeast(0)
+                val currY = yy.coerceAtMost(bitmap.height - 1).coerceAtLeast(0)
 
                 val dist = dist(x, y, xx, yy)
 
@@ -40,11 +41,12 @@ class Retush {
         val newGreen = greenSum / pixelCount
         val newBlue = blueSum / pixelCount
 
-        for (xx in x - Math.round(brushSize).toInt() + 1 .. (x + Math.round(brushSize).toInt() + 1)) {
-            for (yy in y - Math.round(brushSize).toInt() + 1 .. (y + Math.round(brushSize).toInt() + 1)) {
+        for (xx in x - Math.round(brushSize).toInt() + 1..(x + Math.round(brushSize).toInt() + 1)) {
+            for (yy in y - Math.round(brushSize).toInt() + 1..(y + Math.round(brushSize)
+                .toInt() + 1)) {
 
-                val currX = Math.max(Math.min(xx, bitmap.width - 1), 0)
-                val currY = Math.max(Math.min(yy, bitmap.height - 1), 0)
+                val currX = xx.coerceAtMost(bitmap.width - 1).coerceAtLeast(0)
+                val currY = yy.coerceAtMost(bitmap.height - 1).coerceAtLeast(0)
 
                 val dist = dist(x, y, xx, yy)
 
@@ -56,9 +58,15 @@ class Retush {
                     val green = Color.green(pixel)
                     val blue = Color.blue(pixel)
 
-                    val redDiff = Math.round((newRed - red) * (brushSize - dist) / brushSize * strength).toInt()
-                    val greenDiff = Math.round((newGreen - green) * (brushSize - dist) / brushSize * strength).toInt()
-                    val blueDiff = Math.round((newBlue - blue) * (brushSize - dist) / brushSize * strength).toInt()
+                    val redDiff =
+                        Math.round((newRed - red) * (brushSize - dist) / brushSize * strength)
+                            .toInt()
+                    val greenDiff =
+                        Math.round((newGreen - green) * (brushSize - dist) / brushSize * strength)
+                            .toInt()
+                    val blueDiff =
+                        Math.round((newBlue - blue) * (brushSize - dist) / brushSize * strength)
+                            .toInt()
 
                     val newPixel = Color.argb(
                         255,
@@ -79,7 +87,7 @@ class Retush {
         return mutableBitmap
     }
 
-    private fun dist(x1: Int, y1: Int, x2: Int, y2: Int) : Double {
+    private fun dist(x1: Int, y1: Int, x2: Int, y2: Int): Double {
         return sqrt(((x1 - x2).toDouble().pow(2.0) + (y1 - y2).toDouble().pow(2.0)))
     }
 }

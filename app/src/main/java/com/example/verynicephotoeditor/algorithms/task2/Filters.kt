@@ -705,11 +705,12 @@ class Filters {
         return destBitmap
     }
 
-    fun createSteganography50x50(bitmap: Bitmap, bitmapToEncrypt: Bitmap) : Bitmap {
+    fun createSteganography50x50(bitmap: Bitmap, bitmapToEncrypt: Bitmap): Bitmap {
 
         val secretImage = bitmapToEncrypt
 
-        val secretImageResized = Bitmap.createScaledBitmap(secretImage, bitmap.width, bitmap.height, false)
+        val secretImageResized =
+            Bitmap.createScaledBitmap(secretImage, bitmap.width, bitmap.height, false)
 
         val resultImage = Bitmap.createBitmap(bitmap.width, bitmap.height, bitmap.config)
 
@@ -740,9 +741,7 @@ class Filters {
                         removeLeadingZeros(rgbValues[1]).toInt(2),
                         removeLeadingZeros(replaceChar(rgbValues[2], '1', 7)).toInt(2)
                     )
-                }
-
-                else {
+                } else {
                     Color.argb(
                         Color.alpha(coverPixel),
                         removeLeadingZeros(rgbValues[0]).toInt(2),
@@ -758,7 +757,7 @@ class Filters {
         return resultImage
     }
 
-    fun decodeSteganography50x50(bitmap: Bitmap) : Bitmap {
+    fun decodeSteganography50x50(bitmap: Bitmap): Bitmap {
 
         val resultImage = Bitmap.createBitmap(bitmap.width, bitmap.height, bitmap.config)
 
@@ -767,13 +766,12 @@ class Filters {
 
                 val steganographyPixel = bitmap.getPixel(x, y)
 
-                val encodedInfo = addLeadingZeros(Integer.toBinaryString(Color.blue(steganographyPixel)), 8)[7]
+                val encodedInfo =
+                    addLeadingZeros(Integer.toBinaryString(Color.blue(steganographyPixel)), 8)[7]
 
                 val resultPixel = if (encodedInfo == '1') {
                     Color.WHITE
-                }
-
-                else {
+                } else {
                     Color.BLACK
                 }
 
@@ -784,11 +782,12 @@ class Filters {
         return resultImage
     }
 
-    fun createSteganography(bitmap: Bitmap, bitmapToEncrypt: Bitmap) : Bitmap{
+    fun createSteganography(bitmap: Bitmap, bitmapToEncrypt: Bitmap): Bitmap {
 
         val secretImage = bitmapToEncrypt
 
-        val secretImageResized = Bitmap.createScaledBitmap(secretImage, bitmap.width, bitmap.height, false)
+        val secretImageResized =
+            Bitmap.createScaledBitmap(secretImage, bitmap.width, bitmap.height, false)
 
         val resultImage = Bitmap.createBitmap(bitmap.width, bitmap.height, bitmap.config)
 
@@ -869,7 +868,7 @@ class Filters {
         return resultImage
     }
 
-    fun decodeSteganography(bitmap: Bitmap) : Bitmap {
+    fun decodeSteganography(bitmap: Bitmap): Bitmap {
 
         val resultImage = Bitmap.createBitmap(bitmap.width, bitmap.height, bitmap.config)
 
@@ -879,8 +878,10 @@ class Filters {
                 val steganographyPixel = bitmap.getPixel(x, y)
 
                 val red = addLeadingZeros(Integer.toBinaryString(Color.red(steganographyPixel)), 8)
-                val green = addLeadingZeros(Integer.toBinaryString(Color.green(steganographyPixel)), 8)
-                val blue = addLeadingZeros(Integer.toBinaryString(Color.blue(steganographyPixel)), 8)
+                val green =
+                    addLeadingZeros(Integer.toBinaryString(Color.green(steganographyPixel)), 8)
+                val blue =
+                    addLeadingZeros(Integer.toBinaryString(Color.blue(steganographyPixel)), 8)
 
                 var grayscale = "00000000"
 
@@ -893,19 +894,21 @@ class Filters {
                 grayscale = replaceChar(grayscale, blue[6], 6)
                 grayscale = replaceChar(grayscale, blue[7], 7)
 
-                resultImage.setPixel(x, y, Color.argb(
-                    Color.alpha(steganographyPixel),
-                    grayscale.toInt(2),
-                    grayscale.toInt(2),
-                    grayscale.toInt(2)
-                ))
+                resultImage.setPixel(
+                    x, y, Color.argb(
+                        Color.alpha(steganographyPixel),
+                        grayscale.toInt(2),
+                        grayscale.toInt(2),
+                        grayscale.toInt(2)
+                    )
+                )
             }
         }
 
         return resultImage
     }
 
-    fun applySteganographyText(bitmap: Bitmap, text: String) : Bitmap {
+    fun applySteganographyText(bitmap: Bitmap, text: String): Bitmap {
 
         val resultImage = Bitmap.createBitmap(bitmap.width, bitmap.height, bitmap.config)
 
@@ -923,9 +926,7 @@ class Filters {
 
                 val currChar: String = if (currTextIndex == text.length) {
                     "00000000"
-                }
-
-                else {
+                } else {
                     addLeadingZeros(Integer.toBinaryString(text[currTextIndex].toInt()), 8)
                 }
 
@@ -991,7 +992,7 @@ class Filters {
         return resultImage
     }
 
-    fun decodeSteganographyText(bitmap: Bitmap) : String {
+    fun decodeSteganographyText(bitmap: Bitmap): String {
 
         val resultImage = Bitmap.createBitmap(bitmap.width, bitmap.height, bitmap.config)
 
@@ -1028,13 +1029,13 @@ class Filters {
         return decodedText
     }
 
-    private fun replaceChar(str: String, ch: Char, index: Int) : String {
+    private fun replaceChar(str: String, ch: Char, index: Int): String {
         val sb = StringBuilder(str)
         sb.setCharAt(index, ch)
         return sb.toString()
     }
 
-    private fun addLeadingZeros(str : String, len: Int) : String {
+    private fun addLeadingZeros(str: String, len: Int): String {
 
         var value = str
 
@@ -1047,7 +1048,7 @@ class Filters {
         return value
     }
 
-    private fun removeLeadingZeros(str : String) : String {
+    private fun removeLeadingZeros(str: String): String {
 
         var value = str
 
@@ -1064,7 +1065,7 @@ class Filters {
         return "0"
     }
 
-    fun applyUnsharpMask(bitmap: Bitmap, strength: Double, radius: Int) : Bitmap {
+    fun applyUnsharpMask(bitmap: Bitmap, strength: Double, radius: Int): Bitmap {
 
         val blurredBitmap = applyGaussBlur(bitmap, radius)
         val resultImage = Bitmap.createBitmap(bitmap.width, bitmap.height, bitmap.config)

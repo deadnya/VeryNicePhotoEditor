@@ -1,9 +1,11 @@
 package com.example.verynicephotoeditor.algorithms.task3
+
 import android.graphics.Bitmap
 import android.graphics.Color
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+
 class ScalingAlgorithms {
     suspend fun scaleImage(bitmap: Bitmap, scaleFactor: Double): Bitmap = coroutineScope {
         val newWidth = (bitmap.width * scaleFactor).toInt()
@@ -46,6 +48,7 @@ class ScalingAlgorithms {
 
         return@coroutineScope newBitmap
     }
+
     suspend fun scaleImageTrilinear(bitmap: Bitmap, scaleFactor: Double): Bitmap = coroutineScope {
 
         val blurredBitmap = applySelectiveBlur(bitmap)
@@ -75,8 +78,10 @@ class ScalingAlgorithms {
         val numCoroutines = 8
         val partHeight = targetHeight / numCoroutines
 
-        val originalXValues = DoubleArray(targetWidth) { it * bitmap1.width.toDouble() / targetWidth }
-        val originalYValues = DoubleArray(targetHeight) { it * bitmap1.height.toDouble() / targetHeight }
+        val originalXValues =
+            DoubleArray(targetWidth) { it * bitmap1.width.toDouble() / targetWidth }
+        val originalYValues =
+            DoubleArray(targetHeight) { it * bitmap1.height.toDouble() / targetHeight }
 
         for (part in 0 until numCoroutines) {
             launch(Dispatchers.Default) {
@@ -99,6 +104,7 @@ class ScalingAlgorithms {
 
         return@coroutineScope finalBitmap
     }
+
     private fun applySelectiveBlur(bitmap: Bitmap): Bitmap {
         val width = bitmap.width
         val height = bitmap.height
@@ -124,6 +130,7 @@ class ScalingAlgorithms {
 
         return blurredBitmap
     }
+
     private fun convertToGrayscale(bitmap: Bitmap): Bitmap {
         val width = bitmap.width
         val height = bitmap.height
@@ -143,6 +150,7 @@ class ScalingAlgorithms {
 
         return grayscaleBitmap
     }
+
     private fun detectEdges(bitmap: Bitmap): Bitmap {
         val width = bitmap.width
         val height = bitmap.height
@@ -150,11 +158,36 @@ class ScalingAlgorithms {
 
         for (x in 1 until width - 1) {
             for (y in 1 until height - 1) {
-                val gx = (Color.red(bitmap.getPixel(x + 1, y - 1)) + 2 * Color.red(bitmap.getPixel(x + 1, y)) + Color.red(bitmap.getPixel(x + 1, y + 1))) -
-                        (Color.red(bitmap.getPixel(x - 1, y - 1)) + 2 * Color.red(bitmap.getPixel(x - 1, y)) + Color.red(bitmap.getPixel(x - 1, y + 1)))
+                val gx = (Color.red(bitmap.getPixel(x + 1, y - 1)) + 2 * Color.red(
+                    bitmap.getPixel(
+                        x + 1,
+                        y
+                    )
+                ) + Color.red(bitmap.getPixel(x + 1, y + 1))) -
+                        (Color.red(
+                            bitmap.getPixel(
+                                x - 1,
+                                y - 1
+                            )
+                        ) + 2 * Color.red(
+                            bitmap.getPixel(
+                                x - 1,
+                                y
+                            )
+                        ) + Color.red(bitmap.getPixel(x - 1, y + 1)))
 
-                val gy = (Color.red(bitmap.getPixel(x - 1, y + 1)) + 2 * Color.red(bitmap.getPixel(x, y + 1)) + Color.red(bitmap.getPixel(x + 1, y + 1))) -
-                        (Color.red(bitmap.getPixel(x - 1, y - 1)) + 2 * Color.red(bitmap.getPixel(x, y - 1)) + Color.red(bitmap.getPixel(x + 1, y - 1)))
+                val gy = (Color.red(bitmap.getPixel(x - 1, y + 1)) + 2 * Color.red(
+                    bitmap.getPixel(
+                        x,
+                        y + 1
+                    )
+                ) + Color.red(bitmap.getPixel(x + 1, y + 1))) -
+                        (Color.red(bitmap.getPixel(x - 1, y - 1)) + 2 * Color.red(
+                            bitmap.getPixel(
+                                x,
+                                y - 1
+                            )
+                        ) + Color.red(bitmap.getPixel(x + 1, y - 1)))
 
                 val magnitude = Math.sqrt((gx * gx + gy * gy).toDouble()).toInt()
 
@@ -165,6 +198,7 @@ class ScalingAlgorithms {
 
         return edgeBitmap
     }
+
     private fun dilate(bitmap: Bitmap): Bitmap {
         val width = bitmap.width
         val height = bitmap.height
@@ -199,6 +233,7 @@ class ScalingAlgorithms {
 
         return dilatedBitmap
     }
+
     private fun applyBlur(bitmap: Bitmap, x: Int, y: Int): Int {
         var red = 0
         var green = 0
@@ -241,7 +276,13 @@ class ScalingAlgorithms {
             colors[xCeil][yCeil]
         )
     }
-    private fun interpolateTwo(colors1: Array<IntArray>, colors2: Array<IntArray>, x: Double, y: Double): Int {
+
+    private fun interpolateTwo(
+        colors1: Array<IntArray>,
+        colors2: Array<IntArray>,
+        x: Double,
+        y: Double
+    ): Int {
         val nearestPixels1 = findNearestPixels(colors1, x, y)
         val nearestPixels2 = findNearestPixels(colors2, x, y)
 
@@ -250,6 +291,7 @@ class ScalingAlgorithms {
         }
         return interpolatePixels(interpolatedPixels[0], interpolatedPixels[1], x % 1)
     }
+
     private fun interpolatePixels(pixel1: Int, pixel2: Int, weight: Double): Int {
         val a = Color.alpha(pixel1)
         val r = Color.red(pixel1)
@@ -268,6 +310,7 @@ class ScalingAlgorithms {
             (b + (b2 - b) * weight).toInt()
         )
     }
+
     private fun interpolate(nearestPixels: List<Int>, x: Double, y: Double): Int {
         val xWeight = x - x.toInt()
         val yWeight = y - y.toInt()

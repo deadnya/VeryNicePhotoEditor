@@ -11,11 +11,11 @@ import kotlin.math.sqrt
 
 class Affines {
 
-    var idkSmallX = 0.0
-    var idkSmallY = 0.0
-    var idkBigX = 0.0
-    var idkBigY = 0.0
-    var iter = 0
+    private var idkSmallX = 0.0
+    private var idkSmallY = 0.0
+    private var idkBigX = 0.0
+    private var idkBigY = 0.0
+    private var iter = 0
 
     fun affinTransmutation(bitmap: Bitmap, dotsList: List<Dot>): Bitmap {
 
@@ -45,112 +45,17 @@ class Affines {
         )
 
         val matrix = calculateAffineTransformation(src, dst)
-        val matrixSmaller = calculateAffineTransformation(srcSmaller, dst)
-        val matrixBigger = calculateAffineTransformation(srcBigger, dst)
 
         val (scaleUpX, scaleUpY) = isImageBiggerOnXorYAxis(bitmap, matrix)
 
         if (!scaleUpX && !scaleUpY) {
-            //return getTrilinearTransformedBitmap(bitmap, matrix, matrixSmaller, matrixBigger)
+
             return getBilinearTransformedBitmap(bitmap, matrix)
         }
 
         else {
             return getBilinearTransformedBitmap(bitmap, matrix)
         }
-    }
-
-    private fun getTrilinearTransformedBitmap(
-        bitmap: Bitmap,
-        matrix: DoubleArray,
-        matrixSmaller: DoubleArray,
-        matrixBigger: DoubleArray
-    ) : Bitmap {
-
-        val inverseMatrix = calculateInverse(matrix)
-        val inverseMatrixSmaller = calculateInverse(matrixSmaller)
-        val inverseMatrixBigger = calculateInverse(matrixBigger)
-
-        iter = 0
-        val bitmapSmaller = getBilinearTransformedBitmap(bitmap, matrixSmaller)
-        val bitmapBigger = getBilinearTransformedBitmap(bitmap, matrixBigger)
-
-        var newMinX = Double.MAX_VALUE
-        var newMaxX = Double.MIN_VALUE
-        var newMinY = Double.MAX_VALUE
-        var newMaxY = Double.MIN_VALUE
-
-        for (y in 0 until bitmap.height) {
-            for (x in 0 until bitmap.width) {
-                val newX = (matrix[0] * x + matrix[1] * y + matrix[2])
-                val newY = (matrix[3] * x + matrix[4] * y + matrix[5])
-
-                newMinX = minOf(newMinX, newX)
-                newMaxX = maxOf(newMaxX, newX)
-                newMinY = minOf(newMinY, newY)
-                newMaxY = maxOf(newMaxY, newY)
-            }
-        }
-
-        val result = Bitmap.createBitmap((newMaxX - newMinX + 1).toInt(), (newMaxY - newMinY + 1).toInt(), bitmap.config)
-
-        for (y in newMinY.toInt()..newMaxY.toInt()) {
-            for (x in newMinX.toInt()..newMaxX.toInt()) {
-                val oldX = (inverseMatrix[0] * x + inverseMatrix[1] * y + inverseMatrix[2]).toFloat()
-                val oldY = (inverseMatrix[3] * x + inverseMatrix[4] * y + inverseMatrix[5]).toFloat()
-
-                if (oldX.toInt() in 0 until bitmap.width && oldY.toInt() in 0 until bitmap.height) {
-
-                    val pixel = trilinearInterpolation(
-                        oldX,
-                        oldY,
-                        bitmap,
-                        bitmapSmaller,
-                        bitmapBigger,
-                        matrix,
-                        matrixSmaller,
-                        matrixBigger
-                    )
-
-                    result.setPixel(x - newMinX.toInt(), y - newMinY.toInt(), pixel)
-                }
-            }
-        }
-
-        return result
-    }
-
-    private fun trilinearInterpolation(
-        x: Float,
-        y: Float,
-        bitmap: Bitmap,
-        bitmapSmaller: Bitmap,
-        bitmapBigger: Bitmap,
-        matrix: DoubleArray,
-        matrixSmaller: DoubleArray,
-        matrixBigger: DoubleArray
-        ) : Int {
-
-        val inverseMatrix = calculateInverse(matrix)
-        val srcX = (inverseMatrix[0] * x + inverseMatrix[1] * y + inverseMatrix[2]).toFloat()
-        val srcY = (inverseMatrix[3] * x + inverseMatrix[4] * y + inverseMatrix[5]).toFloat()
-
-        val smallX = (matrixSmaller[0] * srcX + matrixSmaller[1] * srcY + matrixSmaller[2]).toFloat()
-        val smallY = (matrixSmaller[3] * srcY + matrixSmaller[4] * srcY + matrixSmaller[5]).toFloat()
-        val pixelSmaller = bitmapSmaller.getPixel((smallX - idkSmallX).toInt(), (smallY - idkSmallY).toInt())
-
-        val bigX = (matrixBigger[0] * srcX + matrixBigger[1] * srcY + matrixBigger[2]).toFloat()
-        val bigY = (matrixBigger[3] * srcY + matrixBigger[4] * srcY + matrixBigger[5]).toFloat()
-        val pixelBigger = bitmapBigger.getPixel((bigX - idkBigX).toInt(), (bigY - idkBigY).toInt())
-
-        val ans = Color.argb(
-            (0.5 * Color.alpha(pixelSmaller) + 0.5 * Color.alpha(pixelBigger)).toInt(),
-            (0.5 * Color.red(pixelSmaller) + 0.5 * Color.red(pixelBigger)).toInt(),
-            (0.5 * Color.green(pixelSmaller) + 0.5 * Color.green(pixelBigger)).toInt(),
-            (0.5 * Color.blue(pixelSmaller) + 0.5 * Color.blue(pixelBigger)).toInt()
-        )
-
-        return ans
     }
 
     private fun getBilinearTransformedBitmap(bitmap: Bitmap, matrix: DoubleArray) : Bitmap {
@@ -303,8 +208,8 @@ class Affines {
         for (xx in x - dotSize + 1..<x + dotSize) {
             for (yy in y - dotSize + 1..<y + dotSize) {
 
-                val currX = Math.max(Math.min(xx, mutableBitmap.width - 1), 0)
-                val currY = Math.max(Math.min(yy, mutableBitmap.height - 1), 0)
+                val currX = xx.coerceAtMost(mutableBitmap.width - 1).coerceAtLeast(0)
+                val currY = yy.coerceAtMost(mutableBitmap.height - 1).coerceAtLeast(0)
 
                 if (dist(
                         xx.toDouble(),

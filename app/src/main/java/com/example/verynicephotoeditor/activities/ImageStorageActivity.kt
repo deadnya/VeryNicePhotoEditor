@@ -38,18 +38,22 @@ class ImageStorageActivity : AppCompatActivity() {
     private lateinit var sharedViewModel: SharedViewModel
 
     @RequiresApi(Build.VERSION_CODES.P)
-    private val pickImage = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val imageUri = result.data?.data
-            if (imageUri != null) {
-                val source = ImageDecoder.createSource(contentResolver, imageUri)
-                val bitmap = ImageDecoder.decodeBitmap(source)
+    private val pickImage =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val imageUri = result.data?.data
+                if (imageUri != null) {
+                    val source = ImageDecoder.createSource(contentResolver, imageUri)
+                    val bitmap = ImageDecoder.decodeBitmap(source)
 
-                binding.mainImage.setImageBitmap(bitmap)
-                sharedViewModel.setBitmap(bitmap)
+                    binding.mainImage.setImageBitmap(bitmap)
+                    sharedViewModel.setBitmap(bitmap)
+                }
+            } else {
+                Toast.makeText(this, "No image selected", Toast.LENGTH_SHORT).show()
             }
         }
-    }
+
     private fun saveImageToGallery(bitmap: Bitmap) {
         val filename = "${System.currentTimeMillis()}.jpg"
         var fos: OutputStream? = null
@@ -60,11 +64,14 @@ class ImageStorageActivity : AppCompatActivity() {
                     put(MediaStore.MediaColumns.MIME_TYPE, "image/jpg")
                     put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
                 }
-                val imageUri: Uri? = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+                val imageUri: Uri? =
+                    resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
                 fos = imageUri?.let { resolver.openOutputStream(it) }
             }
         } else {
-            val imagesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString()
+            val imagesDir =
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+                    .toString()
             val image = File(imagesDir, filename)
             fos = FileOutputStream(image)
         }
@@ -126,7 +133,7 @@ class ImageStorageActivity : AppCompatActivity() {
             ButtonModel("Face Recognition"),
             ButtonModel("")
         )
-        binding.galleryButton.setOnClickListener{
+        binding.galleryButton.setOnClickListener {
             val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
             pickImage.launch(intent)
         }
@@ -139,6 +146,7 @@ class ImageStorageActivity : AppCompatActivity() {
 
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
         recyclerView.adapter = ButtonAdapter(buttonList, supportFragmentManager)
-        recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        recyclerView.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
     }
 }

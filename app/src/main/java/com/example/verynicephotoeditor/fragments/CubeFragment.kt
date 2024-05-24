@@ -59,6 +59,7 @@ class CubeFragment : Fragment()  {
         cube.rotateX(100.0)
         cube.rotateY(100.0)
 
+
         val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.rsz_1lucky)
         drawable?.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
         val image = drawable?.let { Filters().drawableToBitmap(it) }
@@ -71,8 +72,8 @@ class CubeFragment : Fragment()  {
         var startX = 0.0
         var startY = 0.0
 
-        var distX = 0.0
-        var distY = 0.0
+        var distX: Double
+        var distY: Double
 
         binding.cubeCanvas.setOnTouchListener { _, event ->
             when (event.action) {

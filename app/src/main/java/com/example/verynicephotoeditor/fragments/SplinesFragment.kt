@@ -43,7 +43,13 @@ class SplinesFragment : Fragment() {
         val width = size.x / scale
         val height = size.y / scale
 
-        binding.splineCanvas.setImageBitmap(Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888))
+        binding.splineCanvas.setImageBitmap(
+            Bitmap.createBitmap(
+                width,
+                height,
+                Bitmap.Config.ARGB_8888
+            )
+        )
         val bitmap = Filters().drawableToBitmap(binding.splineCanvas.drawable)
         val mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
 
@@ -70,9 +76,30 @@ class SplinesFragment : Fragment() {
                     anchorNextDotFirstIndex = -1
 
 
-                    mainDotsFirstIndex = Spline().getIndexOfDot(mainDotsList, startX, startY, Spline().mainDotSize, false, false)
-                    anchorPrevDotFirstIndex = Spline().getIndexOfDot(mainDotsList, startX, startY, Spline().anchorDotSize, true, false)
-                    anchorNextDotFirstIndex = Spline().getIndexOfDot(mainDotsList, startX, startY, Spline().anchorDotSize, false, true)
+                    mainDotsFirstIndex = Spline().getIndexOfDot(
+                        mainDotsList,
+                        startX,
+                        startY,
+                        Spline().mainDotSize,
+                        false,
+                        false
+                    )
+                    anchorPrevDotFirstIndex = Spline().getIndexOfDot(
+                        mainDotsList,
+                        startX,
+                        startY,
+                        Spline().anchorDotSize,
+                        true,
+                        false
+                    )
+                    anchorNextDotFirstIndex = Spline().getIndexOfDot(
+                        mainDotsList,
+                        startX,
+                        startY,
+                        Spline().anchorDotSize,
+                        false,
+                        true
+                    )
                 }
 
                 MotionEvent.ACTION_MOVE -> {
@@ -82,14 +109,10 @@ class SplinesFragment : Fragment() {
                     if (mainDotsFirstIndex != -1) {
                         mainDotsList[mainDotsFirstIndex].changeX(event.x / scale)
                         mainDotsList[mainDotsFirstIndex].changeY(event.y / scale)
-                    }
-
-                    else if (anchorPrevDotFirstIndex != -1) {
+                    } else if (anchorPrevDotFirstIndex != -1) {
                         mainDotsList[anchorPrevDotFirstIndex].getPrevDot()?.changeX(event.x / scale)
                         mainDotsList[anchorPrevDotFirstIndex].getPrevDot()?.changeY(event.y / scale)
-                    }
-
-                    else if (anchorNextDotFirstIndex != -1) {
+                    } else if (anchorNextDotFirstIndex != -1) {
                         mainDotsList[anchorNextDotFirstIndex].getNextDot()?.changeX(event.x / scale)
                         mainDotsList[anchorNextDotFirstIndex].getNextDot()?.changeY(event.y / scale)
                     }
@@ -98,14 +121,21 @@ class SplinesFragment : Fragment() {
                     val isFxaaSwitchChecked = fxaaSwitch.isChecked
 
                     mutableBitmap.eraseColor(Color.WHITE);
-                    Spline().update(mainDotsList, mutableBitmap, binding, isModeSwitchChecked, isFxaaSwitchChecked)
+                    Spline().update(
+                        mainDotsList,
+                        mutableBitmap,
+                        binding,
+                        isModeSwitchChecked,
+                        isFxaaSwitchChecked
+                    )
                 }
 
                 MotionEvent.ACTION_UP -> {
 
                     val dist = Spline().dist(
                         (event.x / scale).toDouble(), (event.y / scale).toDouble(),
-                        startX.toDouble(), startY.toDouble())
+                        startX.toDouble(), startY.toDouble()
+                    )
 
                     val isClick = dist < 10.0
 
@@ -117,19 +147,24 @@ class SplinesFragment : Fragment() {
                         !isMoving &&
                         mainDotsFirstIndex == -1 &&
                         anchorPrevDotFirstIndex == -1 &&
-                        anchorNextDotFirstIndex == -1) {
+                        anchorNextDotFirstIndex == -1
+                    ) {
 
                         val mainDot = MainDot(startX, startY, null, null)
 
                         val prevDot = AnchorDot(
-                            Math.max(Math.min(startX - spaceLookaround, (mutableBitmap.width - spaceLookaround).toFloat()), spaceLookaround.toFloat()),
-                            Math.max(Math.min(startY, (mutableBitmap.height - spaceLookaround).toFloat()), spaceLookaround.toFloat()),
+                            (startX - spaceLookaround).coerceAtMost((mutableBitmap.width - spaceLookaround).toFloat())
+                                .coerceAtLeast(spaceLookaround.toFloat()),
+                            startY.coerceAtMost((mutableBitmap.height - spaceLookaround).toFloat())
+                                .coerceAtLeast(spaceLookaround.toFloat()),
                             mainDot
                         )
 
                         val nextDot = AnchorDot(
-                            Math.max(Math.min(startX + spaceLookaround, (mutableBitmap.width - spaceLookaround).toFloat()), spaceLookaround.toFloat()),
-                            Math.max(Math.min(startY, (mutableBitmap.height - spaceLookaround).toFloat()), spaceLookaround.toFloat()),
+                            (startX + spaceLookaround).coerceAtMost((mutableBitmap.width - spaceLookaround).toFloat())
+                                .coerceAtLeast(spaceLookaround.toFloat()),
+                            startY.coerceAtMost((mutableBitmap.height - spaceLookaround).toFloat())
+                                .coerceAtLeast(spaceLookaround.toFloat()),
                             mainDot
                         )
 
@@ -141,17 +176,14 @@ class SplinesFragment : Fragment() {
                     if (!isMoving && (
                                 mainDotsFirstIndex != -1 ||
                                         anchorPrevDotFirstIndex != -1 ||
-                                        anchorNextDotFirstIndex != -1)) {
+                                        anchorNextDotFirstIndex != -1)
+                    ) {
 
                         if (mainDotsFirstIndex != -1) {
                             mainDotsList.removeAt(mainDotsFirstIndex)
-                        }
-
-                        else if (anchorPrevDotFirstIndex != -1) {
+                        } else if (anchorPrevDotFirstIndex != -1) {
                             mainDotsList.removeAt(anchorPrevDotFirstIndex)
-                        }
-
-                        else if (anchorNextDotFirstIndex != -1) {
+                        } else if (anchorNextDotFirstIndex != -1) {
                             mainDotsList.removeAt(anchorNextDotFirstIndex)
                         }
                     }
@@ -160,7 +192,13 @@ class SplinesFragment : Fragment() {
                     val isFxaaSwitchChecked = fxaaSwitch.isChecked
 
                     mutableBitmap.eraseColor(Color.WHITE);
-                    Spline().update(mainDotsList, mutableBitmap, binding, isModeSwitchChecked, isFxaaSwitchChecked)
+                    Spline().update(
+                        mainDotsList,
+                        mutableBitmap,
+                        binding,
+                        isModeSwitchChecked,
+                        isFxaaSwitchChecked
+                    )
 
                     isMoving = false
                 }
@@ -179,7 +217,7 @@ class SplinesFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentSplinesBinding.inflate(inflater, container, false)
         return binding.root
     }

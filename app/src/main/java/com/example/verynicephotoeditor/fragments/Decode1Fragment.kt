@@ -25,15 +25,13 @@ class Decode1Fragment : Fragment() {
         val imageButton9 = view.findViewById<ImageButton>(R.id.imageButton9)
         imageButton9.setOnClickListener {
 
-            sharedViewModel = ViewModelProvider(requireActivity()).get(SharedViewModel::class.java)
+            sharedViewModel = ViewModelProvider(requireActivity())[SharedViewModel::class.java]
 
             val bitmap = sharedViewModel.bitmap.value
             if (bitmap != null) {
                 val filteredBitmap = Filters().decodeSteganography50x50(bitmap)
                 sharedViewModel.setBitmap(filteredBitmap)
             }
-
-            Log.d("AAAA", "AAAA")
         }
 
         view.findViewById<ImageButton>(R.id.backPanel).setOnClickListener {

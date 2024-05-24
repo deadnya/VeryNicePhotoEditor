@@ -71,7 +71,6 @@ class Encode1Fragment : Fragment() {
                 sharedViewModel.setBitmap(filteredBitmap)
             }
 
-            Log.d("AAAA", "AAAA")
         }
 
         view.findViewById<ImageButton>(R.id.backPanel).setOnClickListener {

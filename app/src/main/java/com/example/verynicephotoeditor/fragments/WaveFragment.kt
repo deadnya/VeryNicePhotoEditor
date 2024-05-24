@@ -5,7 +5,6 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -40,15 +39,15 @@ class WaveFragment : Fragment() {
             takePictureLauncher.launch(takePictureIntent)
         }
 
-        val seekBar_a = view.findViewById<SeekBar>(R.id.seekBar_a)
-        val seekBarValue_a = view.findViewById<TextView>(R.id.seekBarValue_a)
+        val seekbarA = view.findViewById<SeekBar>(R.id.seekBar_a)
+        val seekbarValueA = view.findViewById<TextView>(R.id.seekBarValue_a)
 
-        val seekBar_b = view.findViewById<SeekBar>(R.id.seekBar_b)
-        val seekBarValue_b = view.findViewById<TextView>(R.id.seekBarValue_b)
+        val seekbarB = view.findViewById<SeekBar>(R.id.seekBar_b)
+        val seekbarValueB = view.findViewById<TextView>(R.id.seekBarValue_b)
 
-        seekBar_a.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        seekbarA.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                seekBarValue_a.text = "a: $progress"
+                seekbarValueA.text = "a: $progress"
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -56,9 +55,9 @@ class WaveFragment : Fragment() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
-        seekBar_b.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        seekbarB.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                seekBarValue_b.text = "b: $progress"
+                seekbarValueB.text = "b: $progress"
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -69,15 +68,14 @@ class WaveFragment : Fragment() {
         val imageButton9 = view.findViewById<ImageButton>(R.id.imageButton9)
         imageButton9.setOnClickListener {
 
-            sharedViewModel = ViewModelProvider(requireActivity()).get(SharedViewModel::class.java)
+            sharedViewModel = ViewModelProvider(requireActivity())[SharedViewModel::class.java]
 
             val bitmap = sharedViewModel.bitmap.value
             if (bitmap != null) {
-                val filteredBitmap = Filters().applyWave(bitmap, seekBar_a.progress, seekBar_b.progress)
+                val filteredBitmap = Filters().applyWave(bitmap, seekbarA.progress, seekbarB.progress)
                 sharedViewModel.setBitmap(filteredBitmap)
             }
 
-            Log.d("AAAA", "AAAAAAAAAAA")
         }
 
         view.findViewById<ImageButton>(R.id.backPanel).setOnClickListener {
